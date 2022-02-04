@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjup.shorturl.mapper.AlarmRecordMapper">
+	<resultMap id="alarmMap" type="AlarmRecordEntity">
+		<id column="alarm_id" property="alarmId" />
+		<result column="device_id" property="deviceId" />
+		<result column="reason" property="reason" />
+		<result column="content" property="content" />
+		<result column="status" property="status" />
+		<result column="results" property="results" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+	
+	<resultMap id="alarmDetailMap" type="AlarmRecordDetail">
+		<id column="alarm_id" property="alarmId" />
+		<result column="device_id" property="deviceId" />
+		<result column="reason" property="reason" />
+		<result column="content" property="content" />
+		<result column="status" property="status" />
+		<result column="results" property="results" />
+		<result column="create_time" property="createTime" />
+		<result column="name" property="deviceName" />
+	</resultMap>
+	
+	<select id="getAlarm" resultMap="alarmMap">
+		select * from alarm_record where 1=1 order by create_time desc
+	</select>
+	
+	<select id="getAlarmDetail" resultMap="alarmDetailMap">
+		select * from alarm_record inner join device on (alarm_record.device_id = device.device_id)
+	</select>
+	
+	<insert id="addAlarm">
+		insert into alarm_record (alarm_id, device_id, reason, content, status, results, create_time)
+		values (#{alarmId}, #{deviceId}, #{reason}, #{content}, #{status}, #{results}, #{createTime})
+	</insert>
+	
+	<delete id="deleteAlarm">
+		delete from alarm_record where alarm_id = #{alarmId}
+	</delete>
+	
+	<update id="updateAlarm">
+		update alarm_record set status=#{status},results=#{results} where alarm_id=#{alarmId}
+	</update>
+	
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjup.shorturl.mapper.DeviceMapper">
+	<resultMap id="deviceMap" type="DeviceEntity">
+		<id column="device_id" property="deviceId" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="sort_weight" property="sortWeight" />
+	</resultMap>
+	
+	<insert id="createDevice">
+		insert into device (device_id,name,type,sort_weight)
+		values (#{deviceId},#{name},#{type},#{sortWeight})
+	</insert>
+	
+	<delete id="deleteDeviceById">
+		delete from device where device_id = #{id}
+	</delete>
+	
+	<update id="updateDeviceById">
+		update device set name = #{name}, type=#{type}, sort_weight=#{sortWeight} where device_id = #{deviceId}
+	</update>
+	
+	<select id="getDevices" resultMap="deviceMap">
+		select * from device where 1 = 1 order by sort_weight asc
+	</select>
+	
+	<select id="getDeviceById" resultMap="deviceMap">
+		select * from device where device_id=#{id}
+	</select>
+	
+	<select id="getDeviceByName" resultMap="deviceMap">
+		select * from device where name like concat('%',#{name},'%')
+	</select>
+</mapper>

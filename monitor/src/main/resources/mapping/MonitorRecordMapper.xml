@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjup.shorturl.mapper.MonitorRecordMapper">
+	<resultMap id="MonitorRecordMap" type="MonitorRecordEntity">
+		<id column="record_id" property="recordId" />
+		<result column="device_id" property="deviceId" />
+		<result column="qpda" property="qpda" />
+		<result column="qpdp" property="qpdp" />
+		<result column="qsda" property="qsda" />
+		<result column="qsdp" property="qsdp" />
+		<result column="collected_time" property="collectedTime" />
+	</resultMap>
+	
+	<select id="getRecord" resultMap="MonitorRecordMap">
+		select * from monitor_record where device_id=#{deviceId} and (collected_time between #{startTime} and #{endTime}) order by collected_time asc
+	</select>
+	
+	<select id="getExceptionRecord" resultMap="MonitorRecordMap">
+		select * from monitor_record where qpda >= #{threshold} or qpdp >= #{threshold} or qsda >= #{threshold} or qsdp >= #{threshold}
+	</select>
+	
+	<select id="getExceptionRecordAfter" resultMap="MonitorRecordMap">
+		select * from monitor_record where collected_time > #{start} and 
+		(qpda >= #{threshold} or qpdp >= #{threshold} or qsda >= #{threshold} or qsdp >= #{threshold})
+	</select>
+</mapper>
