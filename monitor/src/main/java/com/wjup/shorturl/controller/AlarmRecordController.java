@@ -2,6 +2,8 @@ package com.wjup.shorturl.controller;
 
 import java.util.Vector;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import com.wjup.shorturl.service.AlarmRecordService;
 import com.wjup.shorturl.service.MonitorRecordService;
 
 @Controller
+@Api(value = "报警管理",description = "报警管理操作 API", protocols = "http")
 public class AlarmRecordController {
 	
 	@Autowired
@@ -23,7 +26,9 @@ public class AlarmRecordController {
 	private MonitorRecordService monitorRecordService;
 	
 	private static final int THRESHOLD = 800;
-	
+
+	@ApiOperation(value = "获取报警信息", httpMethod = "GET",
+			produces="application/json")
 	@RequestMapping("/alarm")
 	@ResponseBody
 	public String getAlarm() {
@@ -77,11 +82,12 @@ public class AlarmRecordController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "获取报警详情列表", httpMethod = "GET",
+			produces="application/json")
 	@RequestMapping("/alarms")
 	@ResponseBody
 	public String getAlarms() {
-		// todo: 增加设备名称的联表查询
 		JSONObject json = new JSONObject();
 		
 		try {
@@ -135,7 +141,9 @@ public class AlarmRecordController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "更新报警状态", httpMethod = "POST",
+			produces="application/json", consumes = "application/json")
 	@RequestMapping("/alarms/update")
 	@ResponseBody
 	public String getAlarms(int alarmId, int status, String results) {

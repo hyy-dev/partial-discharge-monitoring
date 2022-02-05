@@ -2,6 +2,8 @@ package com.wjup.shorturl.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import com.wjup.shorturl.service.UserService;
 import com.wjup.shorturl.token.TokenUtils;
 
 @Controller
+@Api(value = "设备管理",description = "设备管理操作 API", protocols = "http")
 public class DeviceController {
 	
 	@Autowired
@@ -24,7 +27,9 @@ public class DeviceController {
 	
 	@Autowired
 	private UserService userService;
-	
+
+	@ApiOperation(value = "获取设备列表", httpMethod = "GET",
+			produces="application/json")
 	@RequestMapping("/devices")
 	@ResponseBody
 	public String getDevices() {
@@ -43,7 +48,9 @@ public class DeviceController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "根据id查询设备", httpMethod = "GET",
+			produces="application/json")
 	@RequestMapping(value = "/device/{id}")
 	@ResponseBody
 	public String getDeviceById(@PathVariable("id") String deviceId) {
@@ -68,7 +75,9 @@ public class DeviceController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "根据设备名称查询", httpMethod = "GET",
+			produces="application/json")
 	@RequestMapping(value = "/devices/{name}")
 	@ResponseBody
 	public String getDeviceByName(@PathVariable("name") String name) {
@@ -93,7 +102,9 @@ public class DeviceController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "增加设备", httpMethod = "POST",
+			produces="application/json", consumes = "application/json")
 	@RequestMapping(value="/addDevice")
 	@ResponseBody
 	public String addDevice(HttpServletRequest request, String deviceId, String name, String type, String sortWeight) {
@@ -126,7 +137,9 @@ public class DeviceController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "根据id删除设备", httpMethod = "DELETE",
+			produces="application/json", consumes = "application/json")
 	@RequestMapping(value="/deleteDevice/{id}")
 	@ResponseBody
 	public String deleteDevice(HttpServletRequest request,@PathVariable("id") String id) {
@@ -155,7 +168,9 @@ public class DeviceController {
 		
 		return json.toJSONString();
 	}
-	
+
+	@ApiOperation(value = "更新设备信息", httpMethod = "POST",
+			produces="application/json", consumes = "application/json")
 	@RequestMapping(value="/updateDevice")
 	@ResponseBody
 	public String updateDevice(HttpServletRequest request, String id, String name, String type, String sortWeight) {
