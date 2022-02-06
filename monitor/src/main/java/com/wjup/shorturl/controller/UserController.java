@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @Controller
+@RequestMapping("/api")
 @Api(value = "用户管理",description = "用户管理操作 API", protocols = "http")
 public class UserController {
 	
@@ -60,14 +61,19 @@ public class UserController {
 		return json.toJSONString();
 	}
 
-	@ApiOperation(value = "用户登录", notes = "返回token及用户身份信息", httpMethod = "POST",
-			produces="application/json", consumes = "application/json")
+	@ApiOperation(value = "用户登录", notes = "返回token及用户身份信息", httpMethod = "POST")
 	@RequestMapping("/login")
 	@ResponseBody
 	public String login(String userName, String password) {
 		JSONObject json = new JSONObject();
 
 		UserEntity user = userService.findByUserName(userName);
+
+		if(user == null) {
+			json.put("code", 1);
+			json.put("msg", "用户不存在，请重试");
+			return json.toJSONString();
+		}
 
 		if(user.getPassWord().equals(password)) {
 			json.put("code", 0);
@@ -76,7 +82,7 @@ public class UserController {
 			json.put("user", user);
 		}else {
 			json.put("code", 1);
-			json.put("msg", "用户名或密码错误，请重试");
+			json.put("msg", "密码错误，请重试");
 		}
 
 		return json.toJSONString();

@@ -13,6 +13,7 @@ import com.wjup.shorturl.service.MonitorRecordService;
 
 @Api(value = "监测记录管理",description = "监测记录管理操作 API", protocols = "http")
 @Controller
+@RequestMapping("/api")
 public class MonitorRecordController {
 	
 	@Autowired

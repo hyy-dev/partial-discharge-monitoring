@@ -19,6 +19,7 @@ import com.wjup.shorturl.service.UserService;
 import com.wjup.shorturl.token.TokenUtils;
 
 @Controller
+@RequestMapping("/api")
 @Api(value = "设备管理",description = "设备管理操作 API", protocols = "http")
 public class DeviceController {
 	

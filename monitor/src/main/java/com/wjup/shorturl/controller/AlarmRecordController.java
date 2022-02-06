@@ -18,6 +18,7 @@ import com.wjup.shorturl.service.MonitorRecordService;
 
 @Controller
 @Api(value = "报警管理",description = "报警管理操作 API", protocols = "http")
+@RequestMapping("/api")
 public class AlarmRecordController {
 	
 	@Autowired
