@@ -5,7 +5,7 @@ import { request } from 'umi';
 /** 用户登录 返回token及用户身份信息 POST /login */
 export async function loginUsingPOST7(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  body: API.LoginParams,
+  data: API.LoginParams,
   options?: { [key: string]: any },
 ) {
   return request<API.LoginResult>('/api/login', {
@@ -14,7 +14,7 @@ export async function loginUsingPOST7(
     //   'Content-Type': 'multipart/form-data',
     // },
     // params: body,
-    data: body,
+    data,
     requestType: 'form',
     ...(options || {}),
   });
@@ -29,6 +29,7 @@ export async function registerUsingPOST7(
   return request<string>('/api/register', {
     method: 'POST',
     data,
+    requestType: 'form',
     ...(options || {}),
   });
 }
