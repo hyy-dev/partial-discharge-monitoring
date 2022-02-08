@@ -45,8 +45,14 @@ const Login: React.FC = () => {
       if (res.code === 0) {
         const defaultLoginSuccessMessage = "登录成功";
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        // await setInitialState(res.user);
+        // await fetchUserInfo();
+        await setInitialState((s) => ({
+          ...s,
+          currentUser: {...res.user, token: res.token},
+        }));
+        // 保存登录状态
+        localStorage.setItem('monitor_userName', res.user?.userName ?? '');
+        localStorage.setItem('monitor_password', res?.user?.passWord ?? '');
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
         const { query } = history.location;

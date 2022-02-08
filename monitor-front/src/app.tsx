@@ -8,6 +8,8 @@ import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
+import {loginUsingPOST7 as login} from "@/services/api/userController";
+import { message } from 'antd';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -28,12 +30,27 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser();
-      return msg.data;
+      // const msg = await queryCurrentUser();
+      // return msg.data;
+      if(localStorage.getItem('monitor_userName')) {
+        const res = await login({
+          userName: localStorage.getItem('monitor_userName')!,
+          password: localStorage.getItem('monitor_password')!
+        });
+        if (res.code === 0) {
+          message.success('自动登录成功');
+          return {...res.user, token: res.token};
+        }
+        else {
+          message.error('登录状态失效，请重新登录');
+          throw new Error("登录状态失效");
+        }
+      }
     } catch (error) {
-      // history.push(loginPath);
+      history.push(loginPath);
     }
   };
+
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();

@@ -1,5 +1,11 @@
 declare namespace API {
   type CurrentUser = {
+    // monitor属性
+    userName?: string;
+    password?: string;
+    roleId?: number;
+    token?: string;
+
     name?: string;
     avatar?: string;
     userid?: string;
@@ -27,6 +33,7 @@ declare namespace API {
       userId: number;
       roleId: number;
       userName: string;
+      passWord: string;
     };
     token?: string;
   };
@@ -64,10 +71,8 @@ declare namespace API {
   };
 
   type LoginParams = {
-    username?: string;
+    userName?: string;
     password?: string;
-    // autoLogin?: boolean;
-    roleId?: number;
   };
 
   type ErrorResponse = {
