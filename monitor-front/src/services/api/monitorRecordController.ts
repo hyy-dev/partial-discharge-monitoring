@@ -8,7 +8,7 @@ export async function getRecordUsingGET7(
   params: API.getRecordUsingGET7Params,
   options?: { [key: string]: any },
 ) {
-  return request<string>('/record', {
+  return request<API.getRecordUsingGET7Result>('/api/record', {
     method: 'GET',
     params: {
       ...params,

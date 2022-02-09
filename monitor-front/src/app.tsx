@@ -38,7 +38,7 @@ export async function getInitialState(): Promise<{
           password: localStorage.getItem('monitor_password')!
         });
         if (res.code === 0) {
-          message.success('自动登录成功');
+          message.success('欢迎，' + res.user?.userName + "!");
           return {...res.user, token: res.token};
         }
         else {

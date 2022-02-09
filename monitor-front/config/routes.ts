@@ -18,11 +18,17 @@
       },
     ],
   },
+  // {
+  //   path: '/welcome',
+  //   name: 'welcome',
+  //   icon: 'smile',
+  //   component: './Welcome',
+  // },
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
+    path: '/record/:id',
+    name: '监测记录',
+    icon: 'line-chart',
+    component: './Record',
   },
   {
     path: '/admin',
@@ -42,15 +48,15 @@
       },
     ],
   },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
+  // {
+  //   name: 'list.table-list',
+  //   icon: 'table',
+  //   path: '/list',
+  //   component: './TableList',
+  // },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/record/4',
   },
   {
     component: './404',

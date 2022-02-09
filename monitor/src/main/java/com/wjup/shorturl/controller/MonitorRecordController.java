@@ -34,8 +34,9 @@ public class MonitorRecordController {
 				json.put("data", records);
 			}
 			else {
-				json.put("code", 1);
+				json.put("code", 0);
 				json.put("msg", "查询结果为空");
+				json.put("data", records);
 			}
 		} catch(Exception e) {
 			json.put("code", 2);

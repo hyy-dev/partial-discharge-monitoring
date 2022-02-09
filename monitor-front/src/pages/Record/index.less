@@ -1,0 +1,32 @@
+@import (reference) '~antd/es/style/themes/index';
+
+.record {
+  display: flex;
+  height: 1200px;
+  .data {
+    width: 75%;
+    height: 100%;
+    transition: width .5s;
+  }
+
+  .device {
+    width: 25%;
+    height: 100%;
+    transition: width .5s;
+  }
+  .chartContainer {
+    height: 500px;
+    margin-top: 30px;
+
+    .emptyText {
+      text-align: center;
+    }
+  }
+
+  .listItem {
+    &:hover {
+      background-color: #e6f7ff;
+      cursor: pointer;
+    }
+  }
+}

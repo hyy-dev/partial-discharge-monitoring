@@ -8,7 +8,7 @@ export async function addDeviceUsingPOST7(
   params: API.addDeviceUsingPOST7Params,
   options?: { [key: string]: any },
 ) {
-  return request<string>('/addDevice', {
+  return request<string>('/api/addDevice', {
     method: 'POST',
     params: {
       ...params,
@@ -24,7 +24,7 @@ export async function deleteDeviceUsingDELETE7(
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<string>(`/deleteDevice/${param0}`, {
+  return request<string>(`/api/deleteDevice/${param0}`, {
     method: 'DELETE',
     params: { ...queryParams },
     ...(options || {}),
@@ -38,7 +38,7 @@ export async function getDeviceByIdUsingGET7(
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<string>(`/device/${param0}`, {
+  return request<string>(`/api/device/${param0}`, {
     method: 'GET',
     params: { ...queryParams },
     ...(options || {}),
@@ -47,7 +47,7 @@ export async function getDeviceByIdUsingGET7(
 
 /** 获取设备列表 GET /devices */
 export async function getDevicesUsingGET7(options?: { [key: string]: any }) {
-  return request<string>('/devices', {
+  return request<API.getDevicesResult>('/api/devices', {
     method: 'GET',
     ...(options || {}),
   });
@@ -60,7 +60,7 @@ export async function getDeviceByNameUsingGET7(
   options?: { [key: string]: any },
 ) {
   const { name: param0, ...queryParams } = params;
-  return request<string>(`/devices/${param0}`, {
+  return request<string>(`/api/devices/${param0}`, {
     method: 'GET',
     params: { ...queryParams },
     ...(options || {}),
@@ -73,7 +73,7 @@ export async function updateDeviceUsingPOST7(
   params: API.updateDeviceUsingPOST7Params,
   options?: { [key: string]: any },
 ) {
-  return request<string>('/updateDevice', {
+  return request<string>('/api/updateDevice', {
     method: 'POST',
     params: {
       ...params,
