@@ -42,9 +42,9 @@ const RecordLineChart: React.FC<RecordLineChartConfig> = ({recordData, type}) =>
     yField: 'value',
     seriesField: 'category',
     smooth: true,
-    areaStyle: {
-      fill: 'l(270) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
-    }
+    // areaStyle: {
+    //   fill: 'l(270) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
+    // }
   };
 
   const getAverage = (arr: number[]) =>
@@ -67,7 +67,7 @@ const RecordLineChart: React.FC<RecordLineChartConfig> = ({recordData, type}) =>
                 </Col>
               </Row>
               <div style={{ width: '100%', height: 400}}>
-                <Area {...config} data={splitData(recordData)} />
+                <Line {...config} data={splitData(recordData)} />
               </div>
 
             </>

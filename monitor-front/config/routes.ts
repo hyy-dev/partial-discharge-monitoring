@@ -26,6 +26,10 @@
   // },
   {
     path: '/record/:id',
+    component: './Record',
+  },
+  {
+    path: '/record/4',
     name: '监测记录',
     icon: 'line-chart',
     component: './Record',
@@ -48,16 +52,17 @@
       },
     ],
   },
-  // {
-  //   name: 'list.table-list',
-  //   icon: 'table',
-  //   path: '/list',
-  //   component: './TableList',
-  // },
+  {
+    name: '设备管理',
+    icon: 'table',
+    path: '/list',
+    component: './TableList',
+  },
   {
     path: '/',
     redirect: '/record/4',
   },
+
   {
     component: './404',
   },

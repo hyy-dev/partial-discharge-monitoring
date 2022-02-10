@@ -9,12 +9,13 @@ import RecordLineChart from "@/pages/Record/components/RecordLineChart";
 import {getDevicesUsingGET7 as getDevices} from "@/services/api/deviceController";
 import DeviceList from "@/pages/Record/components/DeviceList";
 import {MenuUnfoldOutlined} from "@ant-design/icons";
+import {PageContainer} from "@ant-design/pro-layout";
 
 type Range = 'day' | 'week' | 'month';
 
 
 const Record: React.FC<{}> = (props) => {
-  const [rangeKey, setRangeKey] = useState<Range>('day');
+  const [rangeKey, setRangeKey] = useState<Range>('week');
   const [range, setRange] = useState<Moment[] | string[]>([
     moment('2021-02-08 00:00:00', 'YYYY-MM-DD HH:mm:ss'),
     moment('2021-02-15 00:00:00', 'YYYY-MM-DD HH:mm:ss')]);
@@ -45,6 +46,7 @@ const Record: React.FC<{}> = (props) => {
 
 
   return (
+    <PageContainer>
     <div className={styles.record}>
       <div className={styles.data} style={ showList ? undefined : { width: '100%'}}>
         <Card
@@ -130,6 +132,7 @@ const Record: React.FC<{}> = (props) => {
         </Card> : null}
       </div>
     </div>
+    </PageContainer>
   )
 }
 

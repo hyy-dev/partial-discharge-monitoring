@@ -11,6 +11,11 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/api';
+import {getDevicesUsingGET7 as getDevices} from "@/services/api/deviceController";
+import {Link} from "@umijs/preset-dumi/lib/theme";
+import { MenuOutlined } from '@ant-design/icons';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
+import { arrayMoveImmutable } from 'array-move';
 
 /**
  * @en-US Add node
@@ -79,6 +84,11 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
   }
 };
 
+const DragHandle = SortableHandle(() => <MenuOutlined style={{ cursor: 'grab', color: '#999' }} />);
+const SortableItem = SortableElement(props => <tr {...props} />);
+const SortableBody = SortableContainer(props => <tbody {...props} />);
+
+
 const TableList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -97,124 +107,54 @@ const TableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
+  const [dataSource, setDataSource] = useState<API.DeviceInfo[]>([]);
+
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+
+  const columns: ProColumns<API.DeviceInfo>[] =[
+      {
+        title: '排序',
+        dataIndex: 'sort',
+        width: 50,
+        className: 'drag-visible',
+        render: () => <DragHandle />,
+        search: false,
+      },
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
-      ),
+      title: '设备id',
+      dataIndex: 'deviceId',
+      tip: '设备的唯一标识',
+      sorter: true,
+    },
+    {
+      title: '设备名称',
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
+      render: (dom, record)=>{
+        return <Link to={`/record/${record.deviceId}`}>
+          {dom}
+        </Link>
+      }
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-      dataIndex: 'desc',
-      valueType: 'textarea',
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
-        />
-      ),
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
-      dataIndex: 'status',
-      hideInForm: true,
+      title: '设备类型',
+      dataIndex: 'type',
+      filters: true,
+      onFilter: false,
+      valueType: 'select',
       valueEnum: {
-        0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
-          status: 'Default',
-        },
-        1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
-          status: 'Processing',
-        },
-        2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
-          status: 'Success',
-        },
-        3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
-          status: 'Error',
-        },
-      },
+        all: { text: '全部'},
+        0: { text: '开关柜'},
+        1: { text: '电缆'},
+      }
+      // renderText: (text) => Number(text) === 0 ? '开关柜' : '电缆',
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
-      sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
+      title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -225,30 +165,60 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
+          编辑
         </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
+        <a key="subscribeAlert" href={`/record/${record.deviceId}`}>
+          查看监测记录
         </a>,
+        // <Button type='danger'>删除</Button>
       ],
     },
   ];
 
+  const onSortEnd = ({ oldIndex, newIndex }: {oldIndex: number; newIndex: number}) => {
+    if (oldIndex !== newIndex) {
+      const newData = arrayMoveImmutable([].concat(dataSource), oldIndex, newIndex).filter(
+        el => !!el,
+      );
+      console.log('Sorted items: ', newData);
+      // this.setState({ dataSource: newData });
+      setDataSource(newData);
+    }
+  };
+
+  const DraggableContainer = props => (
+    <SortableBody
+      useDragHandle
+      disableAutoscroll
+      helperClass="row-dragging"
+      onSortEnd={onSortEnd}
+      {...props}
+    />
+  );
+
+  const DraggableBodyRow = ({ className, style, ...restProps }) => {
+    // function findIndex base on Table rowKey props and should always be a right array index
+    const index = dataSource.findIndex(x => x.index === restProps['data-row-key']);
+    return <SortableItem index={index} {...restProps} />;
+  };
+
   return (
     <PageContainer>
-      <ProTable<API.RuleListItem, API.PageParams>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
+      <ProTable<API.DeviceInfo, API.PageParams>
+        dataSource={dataSource}
+        headerTitle='设备列表'
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="deviceId"
         search={{
           labelWidth: 120,
         }}
+        components={{
+          body: {
+            wrapper: DraggableContainer,
+            row: DraggableBodyRow,
+          },
+        }}
+        pagination={{ defaultPageSize:10 }}
         toolBarRender={() => [
           <Button
             type="primary"
@@ -260,13 +230,37 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={rule}
-        columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
+        request={async (params, sort, filter)=>{
+          const { pageSize=20, current=1 } = params;
+          const res = await getDevices();
+          let managedRes: API.DeviceInfo[] = [];
+          if(res.data) {
+            managedRes = res.data.filter((val)=>(
+              (!params.deviceId || (val.deviceId+'').includes(params.deviceId)) &&
+              (!params.name || val.name.includes(params.name)) &&
+              (!params.type || params.type === 'all' || val.type == params.type) &&
+              (!filter.type || filter.type.includes(val.type + ''))
+            ))
+            // 排序
+            if(sort.deviceId) {
+              const asc = sort.deviceId === 'ascend' ? 1 : -1;
+              managedRes.sort((a, b) => (a.deviceId - b.deviceId) * asc);
+            }
+          }
+          const data = managedRes.slice((current - 1) * pageSize, current * pageSize);
+          setDataSource(data);
+          return {
+            data,
+            success: res.code === 0,
+            total: managedRes.length ?? 0,
+          }
         }}
+        columns={columns}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
