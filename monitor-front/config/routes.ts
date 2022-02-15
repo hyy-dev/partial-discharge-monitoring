@@ -59,6 +59,12 @@
     component: './TableList',
   },
   {
+    name: '报警管理',
+    icon: 'alert',
+    path: '/alarms',
+    component: './AlarmManage',
+  },
+  {
     path: '/',
     redirect: '/record/4',
   },

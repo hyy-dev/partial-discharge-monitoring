@@ -55,4 +55,13 @@ declare namespace API {
       data?: DeviceInfo[];
     }
 
+    type AlarmInfo = {
+      alarmId: number;
+      content: string;
+      createTime: string;
+      deviceId: number;
+      deviceName: string;
+      reason: string;
+      status: number; // 0:待处理,1:已解决,2:已忽略,3:未解决
+    }
 }

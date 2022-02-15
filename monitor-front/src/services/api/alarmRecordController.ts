@@ -12,7 +12,7 @@ export async function getAlarmUsingGET7(options?: { [key: string]: any }) {
 
 /** 获取报警详情列表 GET /alarms */
 export async function getAlarmsUsingGET7(options?: { [key: string]: any }) {
-  return request<string>('/api/alarms', {
+  return request<{ code: number; msg: string; alarms?: API.AlarmInfo[] }>('/api/alarms', {
     method: 'GET',
     ...(options || {}),
   });
