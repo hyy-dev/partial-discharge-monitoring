@@ -54,4 +54,5 @@ declare namespace API {
       msg: string;
       data?: DeviceInfo[];
     }
+
 }

@@ -28,16 +28,16 @@ export async function getInitialState(): Promise<{
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
+
   const fetchUserInfo = async () => {
     try {
-      // const msg = await queryCurrentUser();
-      // return msg.data;
       if(localStorage.getItem('monitor_userName')) {
         const res = await login({
           userName: localStorage.getItem('monitor_userName')!,
           password: localStorage.getItem('monitor_password')!
         });
         if (res.code === 0) {
+
           message.success('欢迎，' + res.user?.userName + "!");
           return {...res.user, token: res.token};
         }
@@ -84,14 +84,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     links: isDev
       ? [
-          <Link to="/umi/plugin/openapi" target="_blank">
+          // <Link to="http://localhost:9527/swagger-ui.html#" target="_blank">
+          //   <LinkOutlined />
+          //   <span>OpenAPI 文档</span>
+          // </Link>,
+          // <Link to="/~docs">
+          //   <BookOutlined />
+          //   <span>业务组件文档</span>
+          // </Link>,
+          <a href="http://localhost:9527/swagger-ui.html#" target="_blank" rel="noreferrer">
             <LinkOutlined />
             <span>OpenAPI 文档</span>
-          </Link>,
-          <Link to="/~docs">
-            <BookOutlined />
-            <span>业务组件文档</span>
-          </Link>,
+          </a>
         ]
       : [],
     menuHeaderRender: undefined,

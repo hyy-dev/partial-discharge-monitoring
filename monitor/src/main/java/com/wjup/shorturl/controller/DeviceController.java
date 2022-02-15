@@ -1,6 +1,7 @@
 package com.wjup.shorturl.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -174,21 +175,24 @@ public class DeviceController {
 			produces="application/json", consumes = "application/json")
 	@RequestMapping(value="/updateDevice")
 	@ResponseBody
-	public String updateDevice(HttpServletRequest request, String id, String name, String type, String sortWeight) {
+	public String updateDevice(HttpServletRequest request,
+							   HttpServletResponse response,
+							   String deviceId, String name, String type, String sortWeight) {
 		JSONObject json = new JSONObject();
 		JSONObject checkResult = checkAuthority(userService, request.getHeader("Authorization"));
 		if(checkResult.get("code") != null && checkResult.get("code").equals(1)) {
+			response.setStatus(401);
 			return checkResult.toJSONString();
 		}
 		
 		DeviceEntity device = new DeviceEntity();
-		device.setDeviceId(Integer.parseInt(id));
+		device.setDeviceId(Integer.parseInt(deviceId));
 		device.setName(name);
 		device.setType(Integer.parseInt(type));
 		device.setSortWeight(Integer.parseInt(sortWeight));
 		
 		try {
-			DeviceEntity checkDevice = deviceService.getDeviceById(Integer.parseInt(id));
+			DeviceEntity checkDevice = deviceService.getDeviceById(Integer.parseInt(deviceId));
 			if(checkDevice == null) {
 				json.put("code", 2);
 				json.put("msg", "修改失败，设备不存在");

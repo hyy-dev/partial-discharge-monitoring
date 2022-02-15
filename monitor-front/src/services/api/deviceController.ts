@@ -70,13 +70,16 @@ export async function getDeviceByNameUsingGET7(
 /** 更新设备信息 POST /updateDevice */
 export async function updateDeviceUsingPOST7(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.updateDeviceUsingPOST7Params,
+  data: API.DeviceInfo,
+  token: string,
   options?: { [key: string]: any },
 ) {
   return request<string>('/api/updateDevice', {
     method: 'POST',
-    params: {
-      ...params,
+    data,
+    requestType: 'form',
+    headers: {
+      Authorization: token
     },
     ...(options || {}),
   });
