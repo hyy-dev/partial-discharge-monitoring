@@ -1,5 +1,5 @@
 import React from 'react';
-import {Area, Line} from '@ant-design/charts';
+import {Line} from '@ant-design/charts';
 import styles from "@/pages/Record/index.less";
 import {Col, Empty, Row, Statistic} from "antd";
 

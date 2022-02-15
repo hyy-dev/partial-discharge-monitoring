@@ -28,15 +28,15 @@ const Login: React.FC = () => {
 
   // const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      await setInitialState((s) => ({
-        ...s,
-        currentUser: userInfo,
-      }));
-    }
-  };
+  // const fetchUserInfo = async () => {
+  //   const userInfo = await initialState?.fetchUserInfo?.();
+  //   if (userInfo) {
+  //     await setInitialState((s) => ({
+  //       ...s,
+  //       currentUser: userInfo,
+  //     }));
+  //   }
+  // };
 
   const handleLogin = async (values: API.LoginParams) => {
     try {
