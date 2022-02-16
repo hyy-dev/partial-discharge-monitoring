@@ -79,8 +79,19 @@ export async function updateDeviceUsingPOST7(
     data,
     requestType: 'form',
     headers: {
-      Authorization: token
+      Authorization: token,
     },
     ...(options || {}),
+  });
+}
+
+export async function addDevice(data: API.DeviceInfo, token: string) {
+  return request<string>('/api/addDevice', {
+    method: 'POST',
+    data,
+    requestType: 'form',
+    headers: {
+      Authorization: token,
+    },
   });
 }
