@@ -11,24 +11,28 @@ export async function getAlarmUsingGET7(options?: { [key: string]: any }) {
 }
 
 /** 获取报警详情列表 GET /alarms */
-export async function getAlarmsUsingGET7(options?: { [key: string]: any }) {
+export async function getAlarmsUsingGET7(
+  params?: { startTime?: string; endTime?: string; deviceId?: number;},
+  options?: { [key: string]: any }) {
   return request<{ code: number; msg: string; alarms?: API.AlarmInfo[] }>('/api/alarms', {
     method: 'GET',
+    params: {
+      ...params
+    },
     ...(options || {}),
   });
 }
 
 /** 更新报警状态 POST /alarms/update */
-export async function getAlarmsUsingPOST7(
+export async function updateAlarmUsingPOST7(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getAlarmsUsingPOST7Params,
+  data: { alarmId: number; status: number; results: string;},
   options?: { [key: string]: any },
 ) {
-  return request<string>('/alarms/update', {
+  return request<{ code: number; msg: string; }>('/api/alarms/update', {
     method: 'POST',
-    params: {
-      ...params,
-    },
+    data,
+    requestType: 'form',
     ...(options || {}),
   });
 }
