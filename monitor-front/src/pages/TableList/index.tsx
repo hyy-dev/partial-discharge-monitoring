@@ -1,18 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message } from 'antd';
 import React, { useState, useRef } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { FormattedMessage } from 'umi';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/api';
 import {
+  addDevice,
   getDevicesUsingGET7 as getDevices,
-  updateDeviceUsingPOST7 as updateDevice,
+  editDevice,
 } from '@/services/api/deviceController';
 import { Link } from '@umijs/preset-dumi/lib/theme';
 import { MenuOutlined } from '@ant-design/icons';
@@ -20,32 +17,6 @@ import { SortableContainer, SortableElement, SortableHandle } from 'react-sortab
 import { arrayMoveImmutable } from 'array-move';
 import './index.less';
 import { useModel } from '@@/plugin-model/useModel';
-import AddForm from './components/AddForm';
-
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
 
 /**
  *  Delete node
@@ -79,24 +50,55 @@ const TableList: React.FC = () => {
    * @en-US The pop-up window of the distribution update window
    * @zh-CN 分布更新窗口的弹窗
    * */
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  const [editModalVisible, handleEditModalVisible] = useState<boolean>(false);
 
-  // const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [currentDeviceConfig, setCurrentDeviceConfig] = useState<API.DeviceInfo>({
+    deviceId: -1,
+    name: '',
+    type: 0,
+    sortWeight: 0,
+  });
 
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  // const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
   const [dataSource, setDataSource] = useState<API.DeviceInfo[]>([]);
   const { initialState } = useModel('@@initialState');
 
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
+  const handleEdit = async (values: API.DeviceInfo) => {
+    const hide = message.loading('正在修改');
+    try {
+      hide();
+      const res = await editDevice(values, initialState?.currentUser?.token || '');
+      if (res.code === 0) {
+        message.success('修改成功');
+        return true;
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (error) {
+      message.error((error as Error).message ?? '修改失败, 请重试');
+      return false;
+    }
+  };
+
+  const handleAdd = async (values: API.DeviceInfo) => {
+    const hide = message.loading('正在添加');
+    try {
+      hide();
+      const res = await addDevice(values, initialState?.currentUser?.token || '');
+      if (res.code === 0) {
+        message.success('添加成功');
+        return true;
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (error) {
+      message.error((error as Error).message ?? '添加失败, 请重试');
+      return false;
+    }
+  };
 
   const columns: ProColumns<API.DeviceInfo>[] = [
     {
@@ -140,8 +142,8 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            handleUpdateModalVisible(true);
-            setCurrentRow(record);
+            handleEditModalVisible(true);
+            setCurrentDeviceConfig(record);
           }}
         >
           编辑
@@ -167,14 +169,13 @@ const TableList: React.FC = () => {
           const oldSortWeight =
             dataSource.find((x) => x.deviceId === value.deviceId)?.sortWeight ?? 0;
           if (value.sortWeight !== oldSortWeight) {
-            return updateDevice({ ...value }, userInfo?.token ?? '');
+            return editDevice({ ...value }, userInfo?.token ?? '');
           } else {
             return true;
           }
         }),
       ).then(
         (res) => {
-          console.log('success res', res);
           message.success('修改设备权重成功');
         },
         () => {
@@ -259,111 +260,32 @@ const TableList: React.FC = () => {
           };
         }}
         columns={columns}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
       />
-      {/*{selectedRowsState?.length > 0 && (*/}
-      {/*  <FooterToolbar*/}
-      {/*    extra={*/}
-      {/*      <div>*/}
-      {/*        <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}*/}
-      {/*        <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}*/}
-      {/*        <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />*/}
-      {/*        &nbsp;&nbsp;*/}
-      {/*        <span>*/}
-      {/*          <FormattedMessage*/}
-      {/*            id="pages.searchTable.totalServiceCalls"*/}
-      {/*            defaultMessage="Total number of service calls"*/}
-      {/*          />{' '}*/}
-      {/*          {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}*/}
-      {/*          <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />*/}
-      {/*        </span>*/}
-      {/*      </div>*/}
-      {/*    }*/}
-      {/*  >*/}
-      {/*    <Button*/}
-      {/*      onClick={async () => {*/}
-      {/*        await handleRemove(selectedRowsState);*/}
-      {/*        setSelectedRows([]);*/}
-      {/*        actionRef.current?.reloadAndRest?.();*/}
-      {/*      }}*/}
-      {/*    >*/}
-      {/*      <FormattedMessage*/}
-      {/*        id="pages.searchTable.batchDeletion"*/}
-      {/*        defaultMessage="Batch deletion"*/}
-      {/*      />*/}
-      {/*    </Button>*/}
-      {/*    <Button type="primary">*/}
-      {/*      <FormattedMessage*/}
-      {/*        id="pages.searchTable.batchApproval"*/}
-      {/*        defaultMessage="Batch approval"*/}
-      {/*      />*/}
-      {/*    </Button>*/}
-      {/*  </FooterToolbar>*/}
-      {/*)}*/}
-      <AddForm
-        deviceId={Math.max(...dataSource.map((device) => device.deviceId)) + 1}
+      <UpdateForm
+        title="添加设备"
+        isDisabled={false}
+        hasInitialType={false}
         actionRef={actionRef}
+        currentDeviceConfig={{
+          deviceId: Math.max(...dataSource.map((device) => device.deviceId)) + 1,
+          name: '',
+          sortWeight: Math.max(...dataSource.map((device) => device.sortWeight)) + 1,
+          type: 0,
+        }}
         visible={createModalVisible}
         handleVisibleChange={handleModalVisible}
-        sortWeight={Math.max(...dataSource.map((device) => device.sortWeight)) + 1}
+        handleUpdate={handleAdd}
       />
-      {/* <ModalForm
-        title="新增设备"
-        width="400px"
-        visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalVisible(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-          label="设备id"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm> */}
-      {/*<UpdateForm*/}
-      {/*  onSubmit={async (value) => {*/}
-      {/*    const success = await handleUpdate(value);*/}
-      {/*    if (success) {*/}
-      {/*      handleUpdateModalVisible(false);*/}
-      {/*      setCurrentRow(undefined);*/}
-      {/*      if (actionRef.current) {*/}
-      {/*        actionRef.current.reload();*/}
-      {/*      }*/}
-      {/*    }*/}
-      {/*  }}*/}
-      {/*  onCancel={() => {*/}
-      {/*    handleUpdateModalVisible(false);*/}
-      {/*    if (!showDetail) {*/}
-      {/*      setCurrentRow(undefined);*/}
-      {/*    }*/}
-      {/*  }}*/}
-      {/*  updateModalVisible={updateModalVisible}*/}
-      {/*  values={currentRow || {}}*/}
-      {/*/>*/}
+      <UpdateForm
+        title="修改设备信息"
+        isDisabled={true}
+        hasInitialType={true}
+        actionRef={actionRef}
+        currentDeviceConfig={currentDeviceConfig}
+        visible={editModalVisible}
+        handleVisibleChange={handleEditModalVisible}
+        handleUpdate={handleEdit}
+      />
 
       {/*<Drawer*/}
       {/*  width={600}*/}
