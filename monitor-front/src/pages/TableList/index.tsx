@@ -5,7 +5,6 @@ import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
@@ -21,25 +20,7 @@ import { SortableContainer, SortableElement, SortableHandle } from 'react-sortab
 import { arrayMoveImmutable } from 'array-move';
 import './index.less';
 import { useModel } from '@@/plugin-model/useModel';
-
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
+import AddForm from './components/AddForm';
 
 /**
  * @en-US Update node
@@ -95,17 +76,14 @@ const SortableBody = SortableContainer((props) => <tbody {...props} />);
 
 const TableList: React.FC = () => {
   /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  /**
    * @en-US The pop-up window of the distribution update window
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
 
   // const [showDetail, setShowDetail] = useState<boolean>(false);
+
+  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
@@ -326,38 +304,46 @@ const TableList: React.FC = () => {
       {/*    </Button>*/}
       {/*  </FooterToolbar>*/}
       {/*)}*/}
-      {/*<ModalForm*/}
-      {/*  title='新增设备'*/}
-      {/*  width="400px"*/}
-      {/*  visible={createModalVisible}*/}
-      {/*  onVisibleChange={handleModalVisible}*/}
-      {/*  onFinish={async (value) => {*/}
-      {/*    const success = await handleAdd(value as API.RuleListItem);*/}
-      {/*    if (success) {*/}
-      {/*      handleModalVisible(false);*/}
-      {/*      if (actionRef.current) {*/}
-      {/*        actionRef.current.reload();*/}
-      {/*      }*/}
-      {/*    }*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  <ProFormText*/}
-      {/*    rules={[*/}
-      {/*      {*/}
-      {/*        required: true,*/}
-      {/*        message: (*/}
-      {/*          <FormattedMessage*/}
-      {/*            id="pages.searchTable.ruleName"*/}
-      {/*            defaultMessage="Rule name is required"*/}
-      {/*          />*/}
-      {/*        ),*/}
-      {/*      },*/}
-      {/*    ]}*/}
-      {/*    width="md"*/}
-      {/*    name="name"*/}
-      {/*  />*/}
-      {/*  <ProFormTextArea width="md" name="desc" />*/}
-      {/*</ModalForm>*/}
+      <AddForm
+        deviceId={Math.max(...dataSource.map((device) => device.deviceId)) + 1}
+        actionRef={actionRef}
+        visible={createModalVisible}
+        handleVisibleChange={handleModalVisible}
+        sortWeight={Math.max(...dataSource.map((device) => device.sortWeight)) + 1}
+      />
+      {/* <ModalForm
+        title="新增设备"
+        width="400px"
+        visible={createModalVisible}
+        onVisibleChange={handleModalVisible}
+        onFinish={async (value) => {
+          const success = await handleAdd(value as API.RuleListItem);
+          if (success) {
+            handleModalVisible(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
+        }}
+      >
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.ruleName"
+                  defaultMessage="Rule name is required"
+                />
+              ),
+            },
+          ]}
+          width="md"
+          name="name"
+          label="设备id"
+        />
+        <ProFormTextArea width="md" name="desc" />
+      </ModalForm> */}
       {/*<UpdateForm*/}
       {/*  onSubmit={async (value) => {*/}
       {/*    const success = await handleUpdate(value);*/}
