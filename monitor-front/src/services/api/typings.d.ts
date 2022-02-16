@@ -62,6 +62,7 @@ declare namespace API {
       deviceId: number;
       deviceName: string;
       reason: string;
+      results: string;
       status: number; // 0:待处理,1:已解决,2:已忽略,3:未解决
     }
 }
