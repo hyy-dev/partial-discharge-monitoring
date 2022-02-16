@@ -1,5 +1,8 @@
 package com.wjup.shorturl.controller;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import io.swagger.annotations.Api;
@@ -85,19 +88,18 @@ public class AlarmRecordController {
 	}
 
 	@ApiOperation(value = "获取报警详情列表", httpMethod = "GET",
-			produces="application/json")
+			produces = "application/json")
 	@RequestMapping("/alarms")
 	@ResponseBody
-	public String getAlarms() {
+	public String getAlarms(String startTime, String endTime, String deviceId) {
 		JSONObject json = new JSONObject();
-		
+
 		try {
 			AlarmRecordEntity[] alarms = alarmService.getAlarm();
 			MonitorRecordEntity[] exceptionRecords;
-			if(alarms.length == 0) {
+			if (alarms.length == 0) {
 				exceptionRecords = monitorRecordService.getExceptionRecord(THRESHOLD);
-			}
-			else {
+			} else {
 				// todo: 监测的开始时间可进一步优化为上一次监测的时间
 				exceptionRecords = monitorRecordService.getExceptionRecordAfter(THRESHOLD, alarms[0].getCreateTime());
 			}
@@ -127,13 +129,32 @@ public class AlarmRecordController {
 				alarm.setCreateTime(exceptionRecord.getCollectedTime());
 				alarm.setDeviceId(exceptionRecord.getDeviceId());
 				alarm.setStatus(0);
-				
+
 				alarmService.addAlarm(alarm);
 			}
-			
+
 			json.put("code", 0);
 			json.put("msg", "获取成功");
-			json.put("alarms", alarmService.getAlarmDetail());
+			AlarmRecordDetail[] alarmResult1;
+			if (startTime != null && endTime != null) {
+				alarmResult1 = alarmService.getAlarmDetailByTime(startTime, endTime);
+			} else {
+				alarmResult1 = alarmService.getAlarmDetail();
+			}
+
+			// deviceName 筛选
+			if (deviceId == null) {
+				json.put("alarms", alarmResult1);
+			} else {
+				ArrayList<AlarmRecordDetail> alarmResult2 = new ArrayList<AlarmRecordDetail>();
+				for (int i = 0; i < alarmResult1.length; i++) {
+					if (alarmResult1[i].getDeviceId() == Integer.parseInt(deviceId)) {
+						alarmResult2.add(alarmResult1[i]);
+					}
+				}
+				json.put("alarms", alarmResult2);
+			}
+
 		} catch(Exception e) {
 			json.put("code", 1);
 			json.put("msg", "服务器错误，获取报警失败");
@@ -144,17 +165,17 @@ public class AlarmRecordController {
 	}
 
 	@ApiOperation(value = "更新报警状态", httpMethod = "POST",
-			produces="application/json", consumes = "application/json")
+			produces = "application/json", consumes = "application/json")
 	@RequestMapping("/alarms/update")
 	@ResponseBody
-	public String getAlarms(int alarmId, int status, String results) {
+	public String updateAlarm(int alarmId, int status, String results) {
 		JSONObject json = new JSONObject();
-		
+
 		try {
 			alarmService.updateAlarm(alarmId, status, results);
 			json.put("code", 0);
 			json.put("msg", "报警状态更新成功");
-		} catch(Exception e) {
+		} catch (Exception e) {
 			json.put("code", 1);
 			json.put("msg", "服务器错误，修改报警状态失败");
 		}

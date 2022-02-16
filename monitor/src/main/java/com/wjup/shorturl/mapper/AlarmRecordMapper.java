@@ -8,14 +8,15 @@ import com.wjup.shorturl.entity.MonitorRecordEntity;
 
 @Repository
 public interface AlarmRecordMapper {
-	AlarmRecordEntity[] getAlarm();
-	
-	AlarmRecordDetail[] getAlarmDetail();
-	
-	void addAlarm(AlarmRecordEntity alarm);
-	
-	void deleteAlarm(int alarmId);
-	
-	void updateAlarm(int alarmId, int status, String results);
-	
+    AlarmRecordEntity[] getAlarm();
+
+    AlarmRecordDetail[] getAlarmDetail();
+
+    AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime);
+
+    void addAlarm(AlarmRecordEntity alarm);
+
+    void deleteAlarm(int alarmId);
+
+    void updateAlarm(int alarmId, int status, String results);
 }
