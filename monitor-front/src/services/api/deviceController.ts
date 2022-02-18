@@ -67,26 +67,19 @@ export async function getDeviceByNameUsingGET7(
   });
 }
 
-/** 更新设备信息 POST /updateDevice */
-export async function updateDeviceUsingPOST7(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  data: API.DeviceInfo,
-  token: string,
-  options?: { [key: string]: any },
-) {
-  return request<string>('/api/updateDevice', {
+export async function editDevice(data: API.DeviceInfo, token: string) {
+  return request<{ code: number; msg: string; error?: string }>('/api/updateDevice', {
     method: 'POST',
     data,
     requestType: 'form',
     headers: {
       Authorization: token,
     },
-    ...(options || {}),
   });
 }
 
 export async function addDevice(data: API.DeviceInfo, token: string) {
-  return request<string>('/api/addDevice', {
+  return request<{ code: number; msg: string; error?: string }>('/api/addDevice', {
     method: 'POST',
     data,
     requestType: 'form',
