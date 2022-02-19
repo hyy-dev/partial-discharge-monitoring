@@ -30,9 +30,17 @@
 		select * from alarm_record inner join device on (alarm_record.device_id = device.device_id) order by create_time desc
 	</select>
 
+	<!--	<select id="getAlarmDetailByTime" resultMap="alarmDetailMap">-->
+	<!--		select * from alarm_record inner join device on (alarm_record.device_id = device.device_id)-->
+	<!--		where create_time between #{startTime} and #{endTime} order by create_time desc-->
+	<!--	</select>-->
+
 	<select id="getAlarmDetailByTime" resultMap="alarmDetailMap">
 		select * from alarm_record inner join device on (alarm_record.device_id = device.device_id)
-		where create_time between #{startTime} and #{endTime} order by create_time desc
+		where
+		(create_time between ifnull(#{startTime}, '2020-11-01 00:00:00') and ifnull(#{endTime}, '2120-11-01 00:00:00'))
+		and device.device_id = if(#{deviceId}=-1,device.device_id,#{deviceId})
+		order by create_time desc
 	</select>
 
 	<insert id="addAlarm">

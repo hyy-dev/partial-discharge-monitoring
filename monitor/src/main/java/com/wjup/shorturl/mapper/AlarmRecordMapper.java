@@ -12,7 +12,8 @@ public interface AlarmRecordMapper {
 
     AlarmRecordDetail[] getAlarmDetail();
 
-    AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime);
+//    AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime);
+AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime, int deviceId);
 
     void addAlarm(AlarmRecordEntity alarm);
 

@@ -8,7 +8,7 @@ public interface AlarmRecordService {
 
 	AlarmRecordDetail[] getAlarmDetail();
 
-	AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime); // 根据时间查询报警记录
+	AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime, int deviceId); // 根据时间查询报警记录
 
 	void addAlarm(AlarmRecordEntity alarm);
 

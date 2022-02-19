@@ -135,25 +135,7 @@ public class AlarmRecordController {
 
 			json.put("code", 0);
 			json.put("msg", "获取成功");
-			AlarmRecordDetail[] alarmResult1;
-			if (startTime != null && endTime != null) {
-				alarmResult1 = alarmService.getAlarmDetailByTime(startTime, endTime);
-			} else {
-				alarmResult1 = alarmService.getAlarmDetail();
-			}
-
-			// deviceName 筛选
-			if (deviceId == null) {
-				json.put("alarms", alarmResult1);
-			} else {
-				ArrayList<AlarmRecordDetail> alarmResult2 = new ArrayList<AlarmRecordDetail>();
-				for (int i = 0; i < alarmResult1.length; i++) {
-					if (alarmResult1[i].getDeviceId() == Integer.parseInt(deviceId)) {
-						alarmResult2.add(alarmResult1[i]);
-					}
-				}
-				json.put("alarms", alarmResult2);
-			}
+			json.put("alarms", alarmService.getAlarmDetailByTime(startTime, endTime, deviceId == null ? -1 : Integer.parseInt(deviceId)));
 
 		} catch(Exception e) {
 			json.put("code", 1);

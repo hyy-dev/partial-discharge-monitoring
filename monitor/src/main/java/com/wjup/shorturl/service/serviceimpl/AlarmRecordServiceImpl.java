@@ -40,8 +40,8 @@ public class AlarmRecordServiceImpl implements AlarmRecordService {
 	}
 
 	@Override
-	public AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime) {
-		return alarmMapper.getAlarmDetailByTime(startTime, endTime);
+	public AlarmRecordDetail[] getAlarmDetailByTime(String startTime, String endTime, int deviceId) {
+		return alarmMapper.getAlarmDetailByTime(startTime, endTime, deviceId);
 	}
 
 }
