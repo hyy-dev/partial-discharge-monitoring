@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjup.shorturl.mapper.OperationLogMapper">
+    <resultMap id="OperationLogMap" type="OperationLogEntity">
+        <id column="log_id" property="logId"/>
+        <result column="alarm_id" property="alarmId"/>
+        <result column="user_name" property="userName"/>
+        <result column="status" property="status"/>
+        <result column="results" property="results"/>
+        <result column="operate_time" property="operateTime"/>
+    </resultMap>
+
+    <select id="getLogs" resultMap="OperationLogMap">
+		select * from operation_log where alarm_id = ${alarmId}
+	</select>
+
+    <insert id="createLog">
+        insert into operation_log (alarm_id, status, results, userName, operateTime)
+        values (#{alarmId}, #{status}, #{results}, #{userName}, #{operateTime})
+    </insert>
+</mapper>
