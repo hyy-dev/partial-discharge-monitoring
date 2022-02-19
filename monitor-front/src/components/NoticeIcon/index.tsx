@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { Tag, message } from 'antd';
 import { groupBy } from 'lodash';
 import moment from 'moment';
-import { useModel, useRequest } from 'umi';
+import { useModel, useRequest, history } from 'umi';
 import { getNotices } from '@/services/ant-design-pro/api';
 
 import NoticeIcon from './NoticeIcon';
 import styles from './index.less';
+import {getAlarmsUsingGET7 as getAlarms} from "@/services/api/alarmRecordController";
+import {AlarmStatusConfig} from "@/pages/AlarmManage";
 
 export type GlobalHeaderRightProps = {
   fetchingNotices?: boolean;
@@ -14,29 +16,33 @@ export type GlobalHeaderRightProps = {
   onNoticeClear?: (tabName?: string) => void;
 };
 
-const getNoticeData = (notices: API.NoticeIconItem[]): Record<string, API.NoticeIconItem[]> => {
+// 处理notice数据
+const getNoticeData = (notices: API.AlarmInfo[]): Record<string, API.NoticeIconItem[]> => {
   if (!notices || notices.length === 0 || !Array.isArray(notices)) {
     return {};
   }
 
-  const newNotices = notices.map((notice) => {
-    const newNotice = { ...notice };
+  const newNotices = notices.filter((val) => val.status === 0).map((notice) => {
+    const newNotice: API.NoticeIconItem = {
+      id: '' + notice.alarmId,
+      title: notice.deviceName,
+      description: notice.reason,
+      extra: AlarmStatusConfig[notice.status].label,
+      datetime: notice.createTime,
+      status: notice.status,
+      type: 'event'
+    };
 
     if (newNotice.datetime) {
-      newNotice.datetime = moment(notice.datetime as string).fromNow();
+      newNotice.datetime = moment(notice.createTime as string).fromNow();
     }
 
     if (newNotice.id) {
       newNotice.key = newNotice.id;
     }
 
-    if (newNotice.extra && newNotice.status) {
-      const color = {
-        todo: '',
-        processing: 'blue',
-        urgent: 'red',
-        doing: 'gold',
-      }[newNotice.status];
+    if (newNotice.extra && newNotice.status !== undefined) {
+      const color = AlarmStatusConfig[newNotice.status].color;
       newNotice.extra = (
         <Tag
           color={color}
@@ -73,11 +79,13 @@ const getUnreadData = (noticeData: Record<string, API.NoticeIconItem[]>) => {
 const NoticeIconView: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
-  const [notices, setNotices] = useState<API.NoticeIconItem[]>([]);
-  const { data } = useRequest(getNotices);
+  // const [notices, setNotices] = useState<API.NoticeIconItem[]>([]);
+  const [notices, setNotices] = useState<API.AlarmInfo[]>([]);
+  // const { data } = useRequest(getNotices);
+  const { data } = useRequest(getAlarms, { formatResult: res => res?.alarms });
 
   useEffect(() => {
-    setNotices(data || []);
+    setNotices(data ?? []);
   }, [data]);
 
   const noticeData = getNoticeData(notices);
@@ -111,41 +119,44 @@ const NoticeIconView: React.FC = () => {
   return (
     <NoticeIcon
       className={styles.action}
-      count={currentUser && currentUser.unreadCount}
+      count={noticeData.event?.length ?? 0}
       onItemClick={(item) => {
-        changeReadState(item.id!);
+        // changeReadState(item.id!);
+        history.push(`/alarms?target=${item.id}`)
       }}
-      onClear={(title: string, key: string) => clearReadState(title, key)}
+      // onClear={(title: string, key: string) => clearReadState(title, key)}
       loading={false}
-      clearText="清空"
+      // clearText="清空"
       viewMoreText="查看更多"
-      onViewMore={() => message.info('Click on view more')}
+      onViewMore={() => history.push('/alarms')}
       clearClose
     >
+      {/*<NoticeIcon.Tab*/}
+      {/*  tabKey="notification"*/}
+      {/*  count={unreadMsg.notification}*/}
+      {/*  list={noticeData.notification}*/}
+      {/*  title="通知"*/}
+      {/*  emptyText="你已查看所有通知"*/}
+      {/*  showViewMore*/}
+      {/*/>*/}
+      {/*<NoticeIcon.Tab*/}
+      {/*  tabKey="message"*/}
+      {/*  count={unreadMsg.message}*/}
+      {/*  list={noticeData.message}*/}
+      {/*  title="消息"*/}
+      {/*  emptyText="您已读完所有消息"*/}
+      {/*  showViewMore*/}
+      {/*/>*/}
       <NoticeIcon.Tab
-        tabKey="notification"
-        count={unreadMsg.notification}
-        list={noticeData.notification}
-        title="通知"
-        emptyText="你已查看所有通知"
-        showViewMore
-      />
-      <NoticeIcon.Tab
-        tabKey="message"
-        count={unreadMsg.message}
-        list={noticeData.message}
-        title="消息"
-        emptyText="您已读完所有消息"
-        showViewMore
-      />
-      <NoticeIcon.Tab
-        tabKey="event"
-        title="待办"
-        emptyText="你已完成所有待办"
+        tabKey="0"
+        title="待处理报警"
+        emptyText="你已处理所有报警"
         count={unreadMsg.event}
         list={noticeData.event}
         showViewMore
+        showClear={false}
       />
+      <></>
     </NoticeIcon>
   );
 };

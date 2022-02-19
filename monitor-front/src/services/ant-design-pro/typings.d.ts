@@ -100,7 +100,7 @@ declare namespace API {
     read?: boolean;
     avatar?: string;
     title?: string;
-    status?: string;
+    status?: number;
     datetime?: string;
     description?: string;
     type?: NoticeIconItemType;

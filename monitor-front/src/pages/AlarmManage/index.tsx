@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef } from 'react';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import {
@@ -12,87 +12,48 @@ import './index.less';
 import { getDevicesUsingGET7 as getDevices } from '@/services/api/deviceController';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import record from '@/pages/Record';
+import AlarmManageDrawer from '@/pages/AlarmManage/AlarmManageDrawer';
+import AlarmDetailDrawer from '@/pages/AlarmManage/AlarmDetailDrawer';
 
-const statusSelectConfig = {
-  0: '待处理',
-  1: '已解决',
-  2: '已忽略',
-  3: '未解决',
-};
-
-const statusConfigMap = [
-  {
+export const AlarmStatusConfig = {
+  0: {
+    label: '待处理',
     color: 'red',
-    content: '待处理',
   },
-  {
+  1: {
+    label: '已解决',
     color: 'green',
-    content: '已解决',
   },
-  {
+  2: {
+    label: '已忽略',
     color: 'blue',
-    content: '已忽略',
   },
-  {
+  3: {
+    label: '未解决',
     color: 'orange',
-    content: '未解决',
   },
-];
-
-const AlarmManageForm: React.FC<{
-  alarm: API.AlarmInfo;
-  tableRef: MutableRefObject<ActionType | undefined>;
-}> = ({ alarm, tableRef }) => {
-  return (
-    <DrawerForm
-      title="报警处理"
-      trigger={<a>报警处理</a>}
-      autoFocusFirstInput
-      drawerProps={{
-        destroyOnClose: true,
-      }}
-      onFinish={async (values) => {
-        const res = await updateAlarm({ ...alarm, ...values });
-        if (res.code === 0) {
-          message.success(res.msg);
-          tableRef?.current?.reload();
-          return true;
-        } else {
-          message.error(res.msg);
-          return false;
-        }
-      }}
-    >
-      <ProFormSelect
-        options={new Array(4).fill(0).map((_, index) => ({
-          label: statusSelectConfig[index],
-          value: index,
-        }))}
-        name="status"
-        label="报警状态"
-        initialValue={alarm.status}
-        rules={[{ required: true, message: '请选择报警状态' }]}
-      />
-      <ProFormTextArea
-        name="results"
-        label="处理结果"
-        fieldProps={{ rows: 4 }}
-        initialValue={alarm.results}
-        placeholder="请输入处理结果"
-      />
-    </DrawerForm>
-  );
 };
 
-const AlarmManage: React.FC = () => {
+const AlarmManage: React.FC = (props) => {
   const ref = useRef<ActionType>();
+  const [targetAlarm, setTargetAlarm] = useState<API.AlarmInfo>();
+  const [alarmDetailDrawerVisible, setAlarmDetailDrawerVisible] = useState<boolean>(false);
+  const [alarmList, setAlarmList] = useState<API.AlarmInfo[]>([]);
+
+  useEffect(()=>{
+    if(props.location?.query?.target) {
+      const id = Number(props.location?.query?.target);
+      setTargetAlarm(alarmList.find((val) => val.alarmId === id));
+      setAlarmDetailDrawerVisible(true);
+    }
+  }, [alarmList, props.location?.query?.target])
 
   const columns: ProColumns<API.AlarmInfo> = [
     {
       title: '报警时间',
       dataIndex: 'createTime',
       colSize: 1.5,
-      renderFormItem: (item, props, form) => {
+      renderFormItem: () => {
         return (
           <DatePicker.RangePicker
             showTime={{ format: 'HH:mm' }}
@@ -105,9 +66,10 @@ const AlarmManage: React.FC = () => {
     {
       title: '设备名称',
       dataIndex: 'deviceName',
-      render: (dom: any, record: API.AlarmInfo) => {
-        return <Link to={`/record/${record.deviceId}`}>{dom}</Link>;
+      render: (dom: any, alarm: API.AlarmInfo) => {
+        return <Link to={`/record/${alarm.deviceId}`}>{dom}</Link>;
       },
+      fieldProps: { showSearch: true },
       colSize: 1.5,
       valueType: 'select',
       request: async () => {
@@ -132,11 +94,14 @@ const AlarmManage: React.FC = () => {
       hideInSearch: true,
       filters: true,
       valueType: 'select',
-      valueEnum: statusSelectConfig,
-      render: (_: any, record: API.AlarmInfo) => (
-        <Tooltip title={record.results ?? '暂无处理结果'} placement="bottom">
-          <Tag color={statusConfigMap[record.status]?.color}>
-            {statusConfigMap[record.status]?.content}
+      valueEnum: Object.keys(AlarmStatusConfig).reduce(
+        (pre, cur) => ({ ...pre, [Number(cur)]: AlarmStatusConfig[cur].label }),
+        {},
+      ),
+      render: (_: any, alarm: API.AlarmInfo) => (
+        <Tooltip title={alarm.results ?? '暂无处理结果'} placement="bottom">
+          <Tag color={AlarmStatusConfig[alarm.status]?.color}>
+            {AlarmStatusConfig[alarm.status]?.label}
           </Tag>
         </Tooltip>
       ),
@@ -144,12 +109,21 @@ const AlarmManage: React.FC = () => {
     {
       title: '报警详情',
       valueType: 'option',
-      render: (_: any, record: API.AlarmInfo) => [<a>查看报警文件</a>],
+      render: (_: any, alarm: API.AlarmInfo) => (
+        <a
+          onClick={() => {
+            setAlarmDetailDrawerVisible(true);
+            setTargetAlarm(alarm);
+          }}
+        >
+          查看报警文件
+        </a>
+      ),
     },
     {
       title: '操作',
       valueType: 'option',
-      render: (_: any, record: API.AlarmInfo) => <AlarmManageForm alarm={record} tableRef={ref} />,
+      render: (_: any, alarm: API.AlarmInfo) => <AlarmManageDrawer alarm={alarm} tableRef={ref} />,
     },
   ];
   return (
@@ -162,21 +136,30 @@ const AlarmManage: React.FC = () => {
         columns={columns}
         actionRef={ref}
         request={async (params, sort, filter) => {
-          console.log('params:', params, filter);
           const requestParams = {
             startTime: params.createTime?.[0],
             endTime: params.createTime?.[1],
             deviceId: params.deviceName ?? undefined,
           };
-          console.log('request params', requestParams);
           const res = await getAlarms(requestParams);
-          const result = res.alarms?.filter((val) => !filter.status || filter.status.includes(''+val.status)) ?? [];
+          setAlarmList(res.alarms ?? []);
+          const result =
+            res.alarms?.filter(
+              (val) => !filter.status || filter.status.includes('' + val.status),
+            ) ?? [];
           return {
             data: result,
             success: res.code === 0,
           };
         }}
       />
+      {targetAlarm && (
+        <AlarmDetailDrawer
+          alarm={targetAlarm}
+          visible={alarmDetailDrawerVisible}
+          setVisible={(v) => setAlarmDetailDrawerVisible(v)}
+        />
+      )}
     </PageContainer>
   );
 };

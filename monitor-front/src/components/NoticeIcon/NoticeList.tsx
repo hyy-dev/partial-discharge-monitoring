@@ -10,7 +10,8 @@ export type NoticeIconTabProps = {
   showViewMore?: boolean;
   style?: React.CSSProperties;
   title: string;
-  tabKey: API.NoticeIconItemType;
+  // tabKey: API.NoticeIconItemType;
+  tabKey: string;
   onClick?: (item: API.NoticeIconItem) => void;
   onClear?: () => void;
   emptyText?: string;
