@@ -65,4 +65,13 @@ declare namespace API {
       results: string;
       status: number; // 0:待处理,1:已解决,2:已忽略,3:未解决
     }
+
+    type LogInfo = {
+      alarmId: number;
+      userName: string;
+      status: number;
+      results: string;
+      operateTime: string;
+      logId: number;
+    }
 }

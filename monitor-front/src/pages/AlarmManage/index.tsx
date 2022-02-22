@@ -38,15 +38,16 @@ const AlarmManage: React.FC = (props) => {
   const ref = useRef<ActionType>();
   const [targetAlarm, setTargetAlarm] = useState<API.AlarmInfo>();
   const [alarmDetailDrawerVisible, setAlarmDetailDrawerVisible] = useState<boolean>(false);
+  const [alarmManageDrawerVisible, setAlarmManageDrawerVisible] = useState<boolean>(false);
   const [alarmList, setAlarmList] = useState<API.AlarmInfo[]>([]);
 
-  useEffect(()=>{
-    if(props.location?.query?.target) {
+  useEffect(() => {
+    if (props.location?.query?.target) {
       const id = Number(props.location?.query?.target);
       setTargetAlarm(alarmList.find((val) => val.alarmId === id));
       setAlarmDetailDrawerVisible(true);
     }
-  }, [alarmList, props.location?.query?.target])
+  }, [alarmList, props.location?.query?.target]);
 
   const columns: ProColumns<API.AlarmInfo> = [
     {
@@ -160,6 +161,14 @@ const AlarmManage: React.FC = (props) => {
           setVisible={(v) => setAlarmDetailDrawerVisible(v)}
         />
       )}
+      {/*{alarmManageDrawerVisible && (*/}
+      {/*  <AlarmManageDrawer*/}
+      {/*    alarm={targetAlarm}*/}
+      {/*    tableRef={ref}*/}
+      {/*    visible={alarmManageDrawerVisible}*/}
+      {/*    setVisible={(v) => setAlarmManageDrawerVisible(v)}*/}
+      {/*  />*/}
+      {/*)}*/}
     </PageContainer>
   );
 };

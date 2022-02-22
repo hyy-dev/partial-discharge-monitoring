@@ -1,6 +1,5 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import { DrawerForm } from '@ant-design/pro-form';
-import { Drawer, Popover, Timeline } from 'antd';
+import React from 'react';
+import {Button, Drawer, Popover, Timeline} from 'antd';
 import { useRequest } from '@@/plugin-request/request';
 import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordController';
 import { AlarmStatusConfig } from '@/pages/AlarmManage/index';
@@ -11,9 +10,9 @@ type AlarmDetailDrawerProps = {
   setVisible: (visible: boolean) => void;
 };
 
-const AlarmDetailDrawer: React.FC<AlarmDetailDrawerProps> = ({ alarm, visible, setVisible }) => {
+const AlarmDetailDrawer: React.FC<AlarmDetailDrawerProps> = ({ alarm, visible, setVisible}) => {
   // const [visible, setVisible] = useState<boolean>(false);
-  const { data, loading } = useRequest(
+  const { data } = useRequest(
     () => {
       return getAlarms({ deviceId: alarm.deviceId });
     },
@@ -29,8 +28,8 @@ const AlarmDetailDrawer: React.FC<AlarmDetailDrawerProps> = ({ alarm, visible, s
         visible={visible}
         contentWrapperStyle={{ width: '50%' }}
       >
-        <Timeline mode="left">
-          {data?.map((val) => (
+        <Timeline mode="left" pending='实时监测中...' reverse={true}>
+          {data?.reverse().map((val) => (
             <Timeline.Item color={AlarmStatusConfig[val.status].color} label={val.createTime}>
               <Popover
                 title={AlarmStatusConfig[val.status].label}

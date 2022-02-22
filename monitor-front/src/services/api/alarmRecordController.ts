@@ -26,7 +26,7 @@ export async function getAlarmsUsingGET7(
 /** 更新报警状态 POST /alarms/update */
 export async function updateAlarmUsingPOST7(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  data: { alarmId: number; status: number; results: string;},
+  data: { alarmId: number; status: number; results: string; userName: string;},
   options?: { [key: string]: any },
 ) {
   return request<{ code: number; msg: string; }>('/api/alarms/update', {
