@@ -1,10 +1,13 @@
 package com.wjup.shorturl.controller;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Vector;
 
+import com.wjup.shorturl.service.OperationLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +23,21 @@ import com.wjup.shorturl.service.AlarmRecordService;
 import com.wjup.shorturl.service.MonitorRecordService;
 
 @Controller
-@Api(value = "报警管理",description = "报警管理操作 API", protocols = "http")
+@Api(value = "报警管理", description = "报警管理操作 API", protocols = "http")
 @RequestMapping("/api")
 public class AlarmRecordController {
-	
+
 	@Autowired
 	private AlarmRecordService alarmService;
 	@Autowired
 	private MonitorRecordService monitorRecordService;
-	
+	@Autowired
+	private OperationLogService logService;
+
 	private static final int THRESHOLD = 800;
 
 	@ApiOperation(value = "获取报警信息", httpMethod = "GET",
-			produces="application/json")
+			produces = "application/json")
 	@RequestMapping("/alarm")
 	@ResponseBody
 	public String getAlarm() {
@@ -150,16 +155,19 @@ public class AlarmRecordController {
 			produces = "application/json", consumes = "application/json")
 	@RequestMapping("/alarms/update")
 	@ResponseBody
-	public String updateAlarm(int alarmId, int status, String results) {
+	public String updateAlarm(int alarmId, int status, String results, String userName) {
 		JSONObject json = new JSONObject();
 
 		try {
 			alarmService.updateAlarm(alarmId, status, results);
+			logService.createLog(alarmId, status, results, userName,
+					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			json.put("code", 0);
 			json.put("msg", "报警状态更新成功");
 		} catch (Exception e) {
 			json.put("code", 1);
 			json.put("msg", "服务器错误，修改报警状态失败");
+			json.put("errorMsg", e.toString());
 		}
 		return json.toJSONString();
 	}

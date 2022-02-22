@@ -12,10 +12,11 @@
 
     <select id="getLogs" resultMap="OperationLogMap">
 		select * from operation_log where alarm_id = ${alarmId}
+		order by operate_time desc
 	</select>
 
     <insert id="createLog">
-        insert into operation_log (alarm_id, status, results, userName, operateTime)
+        insert into operation_log (alarm_id, status, results, user_name, operate_time)
         values (#{alarmId}, #{status}, #{results}, #{userName}, #{operateTime})
     </insert>
 </mapper>
