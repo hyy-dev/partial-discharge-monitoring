@@ -2,25 +2,49 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wjup.shorturl.mapper.MonitorRecordMapper">
 	<resultMap id="MonitorRecordMap" type="MonitorRecordEntity">
-		<id column="record_id" property="recordId" />
-		<result column="device_id" property="deviceId" />
-		<result column="qpda" property="qpda" />
-		<result column="qpdp" property="qpdp" />
-		<result column="qsda" property="qsda" />
-		<result column="qsdp" property="qsdp" />
-		<result column="collected_time" property="collectedTime" />
+		<id column="record_id" property="recordId"/>
+		<result column="device_id" property="deviceId"/>
+		<result column="qpda" property="qpda"/>
+		<result column="qpdp" property="qpdp"/>
+		<result column="qsda" property="qsda"/>
+		<result column="qsdp" property="qsdp"/>
+		<result column="collected_time" property="collectedTime"/>
 	</resultMap>
-	
+
+	<resultMap id="RecordSpanMap" type="RecordSpanEntity">
+		<id column="device_id" property="deviceId"/>
+		<result column="max(collected_time)" property="lastCollectedTime"/>
+		<result column="min(qpda)" property="minQpda"/>
+		<result column="min(qpdp)" property="minQpdp"/>
+		<result column="min(qsda)" property="minQsda"/>
+		<result column="min(qsdp)" property="minQsdp"/>
+		<result column="max(qpda)" property="maxQpda"/>
+		<result column="max(qpdp)" property="maxQpdp"/>
+		<result column="max(qsda)" property="maxQsda"/>
+		<result column="max(qsdp)" property="maxQsdp"/>
+	</resultMap>
+
 	<select id="getRecord" resultMap="MonitorRecordMap">
 		select * from monitor_record where device_id=#{deviceId} and (collected_time between #{startTime} and #{endTime}) order by collected_time asc
 	</select>
-	
+
 	<select id="getExceptionRecord" resultMap="MonitorRecordMap">
 		select * from monitor_record where qpda >= #{threshold} or qpdp >= #{threshold} or qsda >= #{threshold} or qsdp >= #{threshold}
 	</select>
-	
+
 	<select id="getExceptionRecordAfter" resultMap="MonitorRecordMap">
 		select * from monitor_record where collected_time > #{start} and 
 		(qpda >= #{threshold} or qpdp >= #{threshold} or qsda >= #{threshold} or qsdp >= #{threshold})
+	</select>
+
+	<insert id="createRecord">
+		insert into monitor_record (device_id, qpda, qpdp, qsda, qsdp, collected_time)
+        values (#{deviceId},#{qpda},#{qpdp},#{qsda},#{qsdp},#{collectedTime})
+	</insert>
+
+	<select id="getRecordSpan" resultMap="RecordSpanMap">
+		select device_id, max(collected_time),min(qpda),min(qpdp),min(qsda),min(qsdp),
+		max(qpda),max(qpdp),max(qsda),max(qsdp)
+		from monitor_record where device_id=#{deviceId};
 	</select>
 </mapper>

@@ -28,7 +28,6 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                // 自行修改为自己的包路径
                 .apis(RequestHandlerSelectors.basePackage("com.wjup.shorturl.controller"))
                 .paths(PathSelectors.any())
                 .build();
