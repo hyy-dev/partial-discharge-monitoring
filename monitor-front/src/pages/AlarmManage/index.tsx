@@ -15,6 +15,9 @@ import record from '@/pages/Record';
 import AlarmManageDrawer from '@/pages/AlarmManage/AlarmManageDrawer';
 import AlarmDetailDrawer from '@/pages/AlarmManage/AlarmDetailDrawer';
 
+// 轮询时间
+const INTERVAL = 60 * 1000;
+
 export const AlarmStatusConfig = {
   0: {
     label: '待处理',
@@ -42,12 +45,16 @@ const AlarmManage: React.FC = (props) => {
   const [alarmList, setAlarmList] = useState<API.AlarmInfo[]>([]);
 
   useEffect(() => {
+    // 从消息栏进入页面，默认显示该报警详情
     if (props.location?.query?.target) {
-      const id = Number(props.location?.query?.target);
-      setTargetAlarm(alarmList.find((val) => val.alarmId === id));
-      setAlarmDetailDrawerVisible(true);
+      (async () => {
+        const id = Number(props.location?.query?.target);
+        const res = await getAlarms();
+        setTargetAlarm(res.alarms?.find((val) => val.alarmId === id));
+        setAlarmDetailDrawerVisible(true);
+      })();
     }
-  }, [alarmList, props.location?.query?.target]);
+  }, [props.location?.query?.target]);
 
   const columns: ProColumns<API.AlarmInfo> = [
     {
@@ -136,6 +143,7 @@ const AlarmManage: React.FC = (props) => {
         pagination={{ defaultPageSize: 10 }}
         columns={columns}
         actionRef={ref}
+        polling={INTERVAL}
         request={async (params, sort, filter) => {
           const requestParams = {
             startTime: params.createTime?.[0],

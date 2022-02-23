@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Tag, message } from 'antd';
+import React from 'react';
+import { Tag } from 'antd';
 import { groupBy } from 'lodash';
 import moment from 'moment';
-import { useModel, useRequest, history } from 'umi';
-import { getNotices } from '@/services/ant-design-pro/api';
+import { useRequest, history } from 'umi';
 
 import NoticeIcon from './NoticeIcon';
 import styles from './index.less';
-import {getAlarmsUsingGET7 as getAlarms} from "@/services/api/alarmRecordController";
-import {AlarmStatusConfig} from "@/pages/AlarmManage";
+import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordController';
+import { AlarmStatusConfig } from '@/pages/AlarmManage';
 
 export type GlobalHeaderRightProps = {
   fetchingNotices?: boolean;
@@ -22,41 +21,44 @@ const getNoticeData = (notices: API.AlarmInfo[]): Record<string, API.NoticeIconI
     return {};
   }
 
-  const newNotices = notices.filter((val) => val.status === 0).map((notice) => {
-    const newNotice: API.NoticeIconItem = {
-      id: '' + notice.alarmId,
-      title: notice.deviceName,
-      description: notice.reason,
-      extra: AlarmStatusConfig[notice.status].label,
-      datetime: notice.createTime,
-      status: notice.status,
-      type: 'event'
-    };
+  const newNotices = notices
+    .sort((a, b) => a.status - b.status)
+    .map((notice) => {
+      const newNotice: API.NoticeIconItem = {
+        id: '' + notice.alarmId,
+        title: notice.deviceName,
+        description: notice.reason,
+        extra: AlarmStatusConfig[notice.status].label,
+        datetime: notice.createTime,
+        status: notice.status,
+        read: notice.status !== 0,
+        type: 'event',
+      };
 
-    if (newNotice.datetime) {
-      newNotice.datetime = moment(notice.createTime as string).fromNow();
-    }
+      if (newNotice.datetime) {
+        newNotice.datetime = moment(notice.createTime as string).fromNow();
+      }
 
-    if (newNotice.id) {
-      newNotice.key = newNotice.id;
-    }
+      if (newNotice.id) {
+        newNotice.key = newNotice.id;
+      }
 
-    if (newNotice.extra && newNotice.status !== undefined) {
-      const color = AlarmStatusConfig[newNotice.status].color;
-      newNotice.extra = (
-        <Tag
-          color={color}
-          style={{
-            marginRight: 0,
-          }}
-        >
-          {newNotice.extra}
-        </Tag>
-      ) as any;
-    }
+      if (newNotice.extra && newNotice.status !== undefined) {
+        const color = AlarmStatusConfig[newNotice.status].color;
+        newNotice.extra = (
+          <Tag
+            color={color}
+            style={{
+              marginRight: 0,
+            }}
+          >
+            {newNotice.extra}
+          </Tag>
+        ) as any;
+      }
 
-    return newNotice;
-  });
+      return newNotice;
+    });
   return groupBy(newNotices, 'type');
 };
 
@@ -77,52 +79,30 @@ const getUnreadData = (noticeData: Record<string, API.NoticeIconItem[]>) => {
 };
 
 const NoticeIconView: React.FC = () => {
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState || {};
-  // const [notices, setNotices] = useState<API.NoticeIconItem[]>([]);
-  const [notices, setNotices] = useState<API.AlarmInfo[]>([]);
-  // const { data } = useRequest(getNotices);
-  const { data } = useRequest(getAlarms, { formatResult: res => res?.alarms });
+  const { data: notices } = useRequest(getAlarms, {
+    formatResult: (res) => {
+      const alarms = res?.alarms ?? [];
+      const result: API.AlarmInfo[] = [];
+      alarms.forEach((alarm) => {
+        if (result.findIndex((val) => val.deviceId == alarm.deviceId) === -1) {
+          result.push(alarm);
+        }
+      });
+      return result;
+    },
+    pollingInterval: 60 * 1000,
+  });
 
-  useEffect(() => {
-    setNotices(data ?? []);
-  }, [data]);
-
-  const noticeData = getNoticeData(notices);
+  const noticeData = getNoticeData(notices ?? []);
   const unreadMsg = getUnreadData(noticeData || {});
-
-  const changeReadState = (id: string) => {
-    setNotices(
-      notices.map((item) => {
-        const notice = { ...item };
-        if (notice.id === id) {
-          notice.read = true;
-        }
-        return notice;
-      }),
-    );
-  };
-
-  const clearReadState = (title: string, key: string) => {
-    setNotices(
-      notices.map((item) => {
-        const notice = { ...item };
-        if (notice.type === key) {
-          notice.read = true;
-        }
-        return notice;
-      }),
-    );
-    message.success(`${'清空了'} ${title}`);
-  };
 
   return (
     <NoticeIcon
       className={styles.action}
-      count={noticeData.event?.length ?? 0}
+      count={noticeData.event?.filter((val) => val.status === 0).length ?? 0}
       onItemClick={(item) => {
         // changeReadState(item.id!);
-        history.push(`/alarms?target=${item.id}`)
+        history.push(`/alarms?target=${item.id}`);
       }}
       // onClear={(title: string, key: string) => clearReadState(title, key)}
       loading={false}
@@ -131,22 +111,6 @@ const NoticeIconView: React.FC = () => {
       onViewMore={() => history.push('/alarms')}
       clearClose
     >
-      {/*<NoticeIcon.Tab*/}
-      {/*  tabKey="notification"*/}
-      {/*  count={unreadMsg.notification}*/}
-      {/*  list={noticeData.notification}*/}
-      {/*  title="通知"*/}
-      {/*  emptyText="你已查看所有通知"*/}
-      {/*  showViewMore*/}
-      {/*/>*/}
-      {/*<NoticeIcon.Tab*/}
-      {/*  tabKey="message"*/}
-      {/*  count={unreadMsg.message}*/}
-      {/*  list={noticeData.message}*/}
-      {/*  title="消息"*/}
-      {/*  emptyText="您已读完所有消息"*/}
-      {/*  showViewMore*/}
-      {/*/>*/}
       <NoticeIcon.Tab
         tabKey="0"
         title="待处理报警"

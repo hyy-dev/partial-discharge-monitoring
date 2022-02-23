@@ -10,20 +10,29 @@ import { getDevicesUsingGET7 as getDevices } from '@/services/api/deviceControll
 import DeviceList from '@/pages/Record/components/DeviceList';
 import { MenuUnfoldOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
+import { useRequest } from '@@/plugin-request/request';
 
 type Range = 'day' | 'week' | 'month';
 
 const Record: React.FC<{}> = (props) => {
-  console.log(
-    moment().subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
-    moment().format('YYYY-MM-DD HH:mm:ss'),
-  );
   const [rangeKey, setRangeKey] = useState<Range | undefined>('week');
   const [range, setRange] = useState<Moment[] | string[]>([moment().subtract(7, 'days'), moment()]);
-  const [monitorData, setMonitorData] = useState<API.MonitorRecord[]>([]);
+  // const [monitorData, setMonitorData] = useState<API.MonitorRecord[]>([]);
   const [deviceId, setDeviceId] = useState<number>(Number(props.match.params.id));
   const [devices, setDevices] = useState<API.DeviceInfo[]>([]);
   const [showList, setShowList] = useState<boolean>(true);
+  const { data: monitorData } = useRequest(
+    () => {
+      return getRecord({
+        deviceId,
+        startTime: (range[0] as Moment).format('YYYY-MM-DD HH:mm:ss'),
+        endTime: (range[1] as Moment).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    },
+    {
+      refreshDeps: [deviceId, range],
+    },
+  );
 
   useEffect(() => {
     (async function () {
@@ -33,19 +42,6 @@ const Record: React.FC<{}> = (props) => {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    (async function () {
-      const res = await getRecord({
-        deviceId,
-        startTime: (range[0] as Moment).format('YYYY-MM-DD HH:mm:ss'),
-        endTime: (range[1] as Moment).format('YYYY-MM-DD HH:mm:ss'),
-      });
-      if (res.data) {
-        setMonitorData(res.data);
-      }
-    })();
-  }, [deviceId, range]);
 
   return (
     <PageContainer>
@@ -138,23 +134,23 @@ const Record: React.FC<{}> = (props) => {
                   showTime={{ format: 'HH:mm' }}
                   format="YYYY-MM-DD HH:mm"
                   onOk={async (value) => {
-                    // todo: 和单选框联动
                     setRange(value);
+                    // todo: 和单选框联动
                     setRangeKey(undefined);
-                    const res = await getRecord({
-                      deviceId,
-                      startTime: value?.[0]?.format('YYYY-MM-DD HH:mm:ss') ?? '',
-                      endTime: value?.[1]?.format('YYYY-MM-DD HH:mm:ss') ?? '',
-                    });
-                    if (res.data) {
-                      setMonitorData(res.data);
-                    }
+                    // const res = await getRecord({
+                    //   deviceId,
+                    //   startTime: value?.[0]?.format('YYYY-MM-DD HH:mm:ss') ?? '',
+                    //   endTime: value?.[1]?.format('YYYY-MM-DD HH:mm:ss') ?? '',
+                    // });
+                    // if (res.data) {
+                    //   setMonitorData(res.data);
+                    // }
                   }}
                 />
               </Space>
             </div>
-            <RecordLineChart recordData={monitorData} type={0} />
-            <RecordLineChart recordData={monitorData} type={1} />
+            <RecordLineChart recordData={monitorData ?? []} type={0} />
+            <RecordLineChart recordData={monitorData ?? []} type={1} />
           </Card>
         </div>
         <div className={styles.device} style={showList ? undefined : { width: 0 }}>
