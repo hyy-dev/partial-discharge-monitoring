@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Tag } from 'antd';
 import { groupBy } from 'lodash';
 import moment from 'moment';
@@ -8,6 +8,8 @@ import NoticeIcon from './NoticeIcon';
 import styles from './index.less';
 import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordController';
 import { AlarmStatusConfig } from '@/pages/AlarmManage';
+
+import EventBus from "@/utils/eventbus";
 
 export type GlobalHeaderRightProps = {
   fetchingNotices?: boolean;
@@ -22,7 +24,8 @@ const getNoticeData = (notices: API.AlarmInfo[]): Record<string, API.NoticeIconI
   }
 
   const newNotices = notices
-    .sort((a, b) => a.status - b.status)
+    .filter((val) => val.status === 0)
+    // .sort((a, b) => a.status - b.status)
     .map((notice) => {
       const newNotice: API.NoticeIconItem = {
         id: '' + notice.alarmId,
@@ -79,7 +82,7 @@ const getUnreadData = (noticeData: Record<string, API.NoticeIconItem[]>) => {
 };
 
 const NoticeIconView: React.FC = () => {
-  const { data: notices } = useRequest(getAlarms, {
+  const { data: notices, run: updateAlarm } = useRequest(getAlarms, {
     formatResult: (res) => {
       const alarms = res?.alarms ?? [];
       const result: API.AlarmInfo[] = [];
@@ -95,6 +98,12 @@ const NoticeIconView: React.FC = () => {
 
   const noticeData = getNoticeData(notices ?? []);
   const unreadMsg = getUnreadData(noticeData || {});
+
+  useEffect(()=>{
+    EventBus.addListener('alarm update',  async() => {
+      await updateAlarm();
+    })
+  }, [])
 
   return (
     <NoticeIcon

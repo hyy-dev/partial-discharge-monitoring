@@ -14,6 +14,7 @@ import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-de
 import record from '@/pages/Record';
 import AlarmManageDrawer from '@/pages/AlarmManage/AlarmManageDrawer';
 import AlarmDetailDrawer from '@/pages/AlarmManage/AlarmDetailDrawer';
+import EventBus from "@/utils/eventbus";
 
 // 轮询时间
 const INTERVAL = 60 * 1000;
@@ -41,8 +42,6 @@ const AlarmManage: React.FC = (props) => {
   const ref = useRef<ActionType>();
   const [targetAlarm, setTargetAlarm] = useState<API.AlarmInfo>();
   const [alarmDetailDrawerVisible, setAlarmDetailDrawerVisible] = useState<boolean>(false);
-  const [alarmManageDrawerVisible, setAlarmManageDrawerVisible] = useState<boolean>(false);
-  const [alarmList, setAlarmList] = useState<API.AlarmInfo[]>([]);
 
   useEffect(() => {
     // 从消息栏进入页面，默认显示该报警详情
@@ -144,6 +143,9 @@ const AlarmManage: React.FC = (props) => {
         columns={columns}
         actionRef={ref}
         polling={INTERVAL}
+        onDataSourceChange={() => {
+            EventBus.emit('alarm update');
+        }}
         request={async (params, sort, filter) => {
           const requestParams = {
             startTime: params.createTime?.[0],
@@ -151,7 +153,6 @@ const AlarmManage: React.FC = (props) => {
             deviceId: params.deviceName ?? undefined,
           };
           const res = await getAlarms(requestParams);
-          setAlarmList(res.alarms ?? []);
           const result =
             res.alarms?.filter(
               (val) => !filter.status || filter.status.includes('' + val.status),
