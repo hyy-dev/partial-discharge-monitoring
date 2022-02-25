@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './index.less';
-import { Card, Radio, DatePicker, Space, Divider, Tag, Button } from 'antd';
+import { Card, Radio, DatePicker, Space, Divider, Tag, Button, Switch } from 'antd';
 
 import type { Moment } from 'moment';
 import moment from 'moment';
@@ -13,24 +13,34 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 
 type Range = 'day' | 'week' | 'month';
+const INTERVAL = 60 * 1000; // 轮询时间
 
 const Record: React.FC<{}> = (props) => {
   const [rangeKey, setRangeKey] = useState<Range | undefined>('week');
-  const [range, setRange] = useState<Moment[] | string[]>([moment().subtract(7, 'days'), moment()]);
+  const [range, setRange] = useState<Moment[]>([moment().subtract(7, 'days'), moment()]);
   // const [monitorData, setMonitorData] = useState<API.MonitorRecord[]>([]);
   const [deviceId, setDeviceId] = useState<number>(Number(props.match.params.id));
   const [devices, setDevices] = useState<API.DeviceInfo[]>([]);
   const [showList, setShowList] = useState<boolean>(true);
-  const { data: monitorData } = useRequest(
-    () => {
-      return getRecord({
+  const [willUpdate, setWillUpdate] = useState<boolean>(true);
+  const {
+    data: monitorData,
+    run: updateMonitorDate,
+  } = useRequest(
+    async (update?: boolean) => {
+      if (update) {
+        setRange([range[0], moment()]);
+      }
+      const params = {
         deviceId,
         startTime: (range[0] as Moment).format('YYYY-MM-DD HH:mm:ss'),
-        endTime: (range[1] as Moment).format('YYYY-MM-DD HH:mm:ss'),
-      });
+        endTime: (update ? moment() : (range[1] as Moment)).format('YYYY-MM-DD HH:mm:ss'),
+      };
+      return getRecord(params);
     },
     {
-      refreshDeps: [deviceId, range],
+      refreshDeps: [deviceId],
+      pollingInterval: INTERVAL,
     },
   );
 
@@ -73,19 +83,19 @@ const Record: React.FC<{}> = (props) => {
             style={{ marginRight: 20, height: '100%' }}
           >
             <div>
-              <Space>
+              <Space wrap>
                 <Radio.Group
                   defaultValue="week"
                   value={rangeKey}
                   buttonStyle="solid"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     setRangeKey(e.target.value);
                     const baseTime =
                       range[1] || range[0] || moment('2021-02-15 00:00:00', 'YYYY-MM-DD HH:mm:ss');
 
                     switch (e.target.value) {
                       case 'day': {
-                        setRange([
+                        await setRange([
                           moment(
                             moment(baseTime).subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss'),
                             'YYYY-MM-DD HH:mm:ss',
@@ -98,7 +108,7 @@ const Record: React.FC<{}> = (props) => {
                         break;
                       }
                       case 'week': {
-                        setRange([
+                        await setRange([
                           moment(
                             moment(baseTime).subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
                             'YYYY-MM-DD HH:mm:ss',
@@ -111,7 +121,7 @@ const Record: React.FC<{}> = (props) => {
                         break;
                       }
                       case 'month':
-                        setRange([
+                        await setRange([
                           moment(
                             moment(baseTime).subtract(1, 'months').format('YYYY-MM-DD HH:mm:ss'),
                             'YYYY-MM-DD HH:mm:ss',
@@ -123,6 +133,7 @@ const Record: React.FC<{}> = (props) => {
                         ]);
                         break;
                     }
+                    await updateMonitorDate();
                   }}
                 >
                   <Radio.Button value="day">近一日</Radio.Button>
@@ -133,8 +144,10 @@ const Record: React.FC<{}> = (props) => {
                   value={range}
                   showTime={{ format: 'HH:mm' }}
                   format="YYYY-MM-DD HH:mm"
+                  disabled={[false, willUpdate]}
                   onOk={async (value) => {
-                    setRange(value);
+                    await setRange(value);
+                    await updateMonitorDate();
                     // todo: 和单选框联动
                     setRangeKey(undefined);
                     // const res = await getRecord({
@@ -147,6 +160,16 @@ const Record: React.FC<{}> = (props) => {
                     // }
                   }}
                 />
+                <span>
+                  <span style={{ marginRight: 5 }}>实时更新</span>
+                  <Switch
+                    defaultChecked
+                    onChange={async (v) => {
+                      setWillUpdate(v);
+                      if (v) await updateMonitorDate(v);
+                    }}
+                  />
+                </span>
               </Space>
             </div>
             <RecordLineChart recordData={monitorData ?? []} type={0} />
