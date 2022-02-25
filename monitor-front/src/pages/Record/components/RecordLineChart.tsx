@@ -48,7 +48,7 @@ const RecordLineChart: React.FC<RecordLineChartConfig> = ({recordData, type}) =>
   };
 
   const getAverage = (arr: number[]) =>
-    arr.reduce((pre, cur) => pre+cur, 0)/ arr.length;
+    Math.round(arr.reduce((pre, cur) => pre + cur, 0) / arr.length);
 
 
   return <>
@@ -63,7 +63,7 @@ const RecordLineChart: React.FC<RecordLineChartConfig> = ({recordData, type}) =>
                   <Statistic title={typeConfig[type].text + "放电峰值（pC）"} value={Math.max(...recordData.map((val)=>val[typeConfig[type].quota[1]])) ?? undefined} />
                 </Col>
                 <Col span={12}>
-                  <Statistic title={typeConfig[type].text + "放电均值（pC）"} value={getAverage(recordData.map((val)=>val[typeConfig[type].quota[0]])) ?? undefined} precision={2} />
+                  <Statistic title={typeConfig[type].text + "放电均值（pC）"} value={getAverage(recordData.map((val)=>val[typeConfig[type].quota[0]])) ?? undefined} />
                 </Col>
               </Row>
               <div style={{ width: '100%', height: 400}}>

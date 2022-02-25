@@ -66,6 +66,9 @@ const AlarmManage: React.FC = (props) => {
             showTime={{ format: 'HH:mm' }}
             format="YYYY-MM-DD HH:mm"
             placeholder={['开始时间', '结束时间']}
+            disabledDate={(current) => {
+              return current > moment().endOf('day');
+            }}
           />
         );
       },

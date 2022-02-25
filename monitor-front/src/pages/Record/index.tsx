@@ -13,7 +13,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 
 type Range = 'day' | 'week' | 'month';
-const INTERVAL = 60 * 1000; // 轮询时间
+const INTERVAL = 10 * 1000; // 轮询时间
 
 const Record: React.FC<{}> = (props) => {
   const [rangeKey, setRangeKey] = useState<Range | undefined>('week');
@@ -26,6 +26,7 @@ const Record: React.FC<{}> = (props) => {
   const {
     data: monitorData,
     run: updateMonitorDate,
+    cancel,
   } = useRequest(
     async (update?: boolean) => {
       if (update) {
@@ -134,6 +135,7 @@ const Record: React.FC<{}> = (props) => {
                         break;
                     }
                     await updateMonitorDate();
+                    if (!willUpdate) cancel();
                   }}
                 >
                   <Radio.Button value="day">近一日</Radio.Button>
@@ -145,9 +147,13 @@ const Record: React.FC<{}> = (props) => {
                   showTime={{ format: 'HH:mm' }}
                   format="YYYY-MM-DD HH:mm"
                   disabled={[false, willUpdate]}
+                  disabledDate={(current) => {
+                    return current > moment().endOf('day');
+                  }}
                   onOk={async (value) => {
                     await setRange(value);
                     await updateMonitorDate();
+                    if (!willUpdate) cancel();
                     // todo: 和单选框联动
                     setRangeKey(undefined);
                     // const res = await getRecord({
@@ -167,6 +173,7 @@ const Record: React.FC<{}> = (props) => {
                     onChange={async (v) => {
                       setWillUpdate(v);
                       if (v) await updateMonitorDate(v);
+                      else cancel();
                     }}
                   />
                 </span>
