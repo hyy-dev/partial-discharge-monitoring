@@ -8,12 +8,12 @@ import { getRecordUsingGET7 as getRecord } from '@/services/api/monitorRecordCon
 import RecordLineChart from '@/pages/Record/components/RecordLineChart';
 import { getDevicesUsingGET7 as getDevices } from '@/services/api/deviceController';
 import DeviceList from '@/pages/Record/components/DeviceList';
-import { MenuUnfoldOutlined } from '@ant-design/icons';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 
 type Range = 'day' | 'week' | 'month';
-const INTERVAL = 10 * 1000; // 轮询时间
+const INTERVAL = 60 * 1000; // 轮询时间
 
 const Record: React.FC<{}> = (props) => {
   const [rangeKey, setRangeKey] = useState<Range | undefined>('week');
@@ -75,6 +75,7 @@ const Record: React.FC<{}> = (props) => {
                     onClick={() => {
                       setShowList(true);
                     }}
+                    icon={<MenuFoldOutlined />}
                   >
                     切换设备
                   </Button>
