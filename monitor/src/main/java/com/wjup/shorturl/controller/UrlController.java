@@ -1,31 +1,31 @@
-package com.wjup.shorturl.controller;
-
-import com.alibaba.fastjson.JSONObject;
-import com.wjup.shorturl.entity.UrlEntity;
-import com.wjup.shorturl.service.UrlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.thymeleaf.util.DateUtils;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Random;
-import java.util.UUID;
-
-/**
- * Create by wjup on 2019/9/29 11:33
- * <p>
- * 短网址生成项目
- */
-
+//package com.wjup.shorturl.controller;
+//
+//import com.alibaba.fastjson.JSONObject;
+//import com.wjup.shorturl.entity.UrlEntity;
+//import com.wjup.shorturl.service.UrlService;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Controller;
+//import org.springframework.ui.Model;
+//import org.springframework.web.bind.annotation.PathVariable;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.ResponseBody;
+//import org.thymeleaf.util.DateUtils;
+//
+//import javax.servlet.ServletException;
+//import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletResponse;
+//import java.io.IOException;
+//import java.util.Date;
+//import java.util.Locale;
+//import java.util.Random;
+//import java.util.UUID;
+//
+///**
+// * Create by wjup on 2019/9/29 11:33
+// * <p>
+// * 短网址生成项目
+// */
+//
 //@Controller
 //public class UrlController {
 //
