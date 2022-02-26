@@ -7,7 +7,7 @@
         path: '/user',
         routes: [
           {
-            name: 'login',
+            name: 'lgin',
             path: '/user/login',
             component: './user/Login',
           },
@@ -18,12 +18,6 @@
       },
     ],
   },
-  // {
-  //   path: '/welcome',
-  //   name: 'welcome',
-  //   icon: 'smile',
-  //   component: './Welcome',
-  // },
   {
     path: '/record/:id',
     component: './Record',
@@ -33,24 +27,6 @@
     name: '监测记录',
     icon: 'line-chart',
     component: './Record',
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
-      },
-      {
-        component: './404',
-      },
-    ],
   },
   {
     name: '设备管理',

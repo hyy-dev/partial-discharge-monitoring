@@ -26,7 +26,7 @@ export async function registerUsingPOST7(
   data: API.RegisterParams,
   options?: { [key: string]: any },
 ) {
-  return request<string>('/api/register', {
+  return request<{ code: number; msg: string; }>('/api/register', {
     method: 'POST',
     data,
     requestType: 'form',

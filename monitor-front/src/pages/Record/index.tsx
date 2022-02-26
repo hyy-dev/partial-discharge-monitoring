@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './index.less';
-import { Card, Radio, DatePicker, Space, Divider, Tag, Button, Switch } from 'antd';
+import { Card, Radio, DatePicker, Space, Tag, Button, Switch } from 'antd';
 
 import type { Moment } from 'moment';
 import moment from 'moment';

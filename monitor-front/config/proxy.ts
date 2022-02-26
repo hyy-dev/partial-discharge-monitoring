@@ -23,6 +23,11 @@ export default {
       changeOrigin: true,
     },
   },
+  build: {
+    '/api/': {
+      target: 'http://39.107.70.201:9527'
+    }
+  },
   test: {
     '/api/': {
       // target: 'https://proapi.azurewebsites.net',

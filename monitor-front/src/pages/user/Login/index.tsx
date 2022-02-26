@@ -1,7 +1,7 @@
 import { Alert, Button, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { ProFormText, LoginForm, ProFormSelect } from '@ant-design/pro-form';
-import { history, FormattedMessage, useModel } from 'umi';
+import { history, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { loginUsingPOST7 as login } from '@/services/api/userController';
 import { registerUsingPOST7 as register } from "@/services/api/userController";
@@ -24,19 +24,7 @@ const LoginMessage: React.FC<{
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>();
   const [type, setType] = useState<string>('login');
-  const { initialState, setInitialState } = useModel('@@initialState');
-
-  // const intl = useIntl();
-
-  // const fetchUserInfo = async () => {
-  //   const userInfo = await initialState?.fetchUserInfo?.();
-  //   if (userInfo) {
-  //     await setInitialState((s) => ({
-  //       ...s,
-  //       currentUser: userInfo,
-  //     }));
-  //   }
-  // };
+  const { setInitialState } = useModel('@@initialState');
 
   const handleLogin = async (values: API.LoginParams) => {
     try {
@@ -147,12 +135,7 @@ const Login: React.FC = () => {
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.username.required"
-                        defaultMessage="请输入用户名!"
-                      />
-                    ),
+                    message: '请输入用户名',
                   },
                 ]}
               />
@@ -195,12 +178,7 @@ const Login: React.FC = () => {
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.phoneNumber.required"
-                        defaultMessage="请输入用户名！"
-                      />
-                    ),
+                    message: "请输入用户名！",
                   }
                 ]}
               />

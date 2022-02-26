@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Drawer, Popover, Timeline} from 'antd';
+import {Drawer, Popover, Timeline} from 'antd';
 import { useRequest } from '@@/plugin-request/request';
 import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordController';
 import { AlarmStatusConfig } from '@/pages/AlarmManage/index';

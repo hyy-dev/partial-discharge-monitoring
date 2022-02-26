@@ -13,7 +13,7 @@ class EventBus {
         e[i].apply(this, args);
       }
     } else {
-      e[0].apply(this, args);
+      e?.[0].apply(this, args);
     }
   }
 

@@ -1,20 +1,15 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import {
-  getAlarmsUsingGET7 as getAlarms,
-  updateAlarmUsingPOST7 as updateAlarm,
-} from '@/services/api/alarmRecordController';
+import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordController';
 import { Link } from '@umijs/preset-dumi/lib/theme';
-import { Button, DatePicker, message, Tag, Tooltip } from 'antd';
+import { DatePicker, Tag, Tooltip } from 'antd';
 import moment from 'moment';
 import './index.less';
 import { getDevicesUsingGET7 as getDevices } from '@/services/api/deviceController';
-import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import record from '@/pages/Record';
 import AlarmManageDrawer from '@/pages/AlarmManage/AlarmManageDrawer';
 import AlarmDetailDrawer from '@/pages/AlarmManage/AlarmDetailDrawer';
-import EventBus from "@/utils/eventbus";
+import EventBus from '@/utils/eventbus';
 
 // 轮询时间
 const INTERVAL = 60 * 1000;
@@ -147,7 +142,7 @@ const AlarmManage: React.FC = (props) => {
         actionRef={ref}
         polling={INTERVAL}
         onDataSourceChange={() => {
-            EventBus.emit('alarm update');
+          EventBus.emit('alarm update');
         }}
         request={async (params, sort, filter) => {
           const requestParams = {
