@@ -81,8 +81,8 @@ const Login: React.FC = () => {
       <div className={styles.content}>
         <LoginForm
           logo={<img alt="logo" src="/logo.svg" />}
-          title="局部放射监测系统"
-          subTitle="电缆与开关柜局部放射实时监测与报警系统"
+          title="局部放电监测系统"
+          subTitle="电缆与开关柜局部放电实时监测与报警系统"
           initialValues={{
             autoLogin: true,
           }}

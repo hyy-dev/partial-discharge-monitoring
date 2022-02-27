@@ -10,6 +10,7 @@ import { getAlarmsUsingGET7 as getAlarms } from '@/services/api/alarmRecordContr
 import { AlarmStatusConfig } from '@/pages/AlarmManage';
 
 import EventBus from "@/utils/eventbus";
+import 'moment/locale/zh-cn'
 
 export type GlobalHeaderRightProps = {
   fetchingNotices?: boolean;
