@@ -70,10 +70,14 @@ declare namespace API {
     status?: string;
   };
 
-  type LoginParams = {
+  interface LoginParams {
     userName?: string;
     password?: string;
   };
+
+  interface LoginFormParams extends LoginParams {
+    isAutoLogin: boolean;
+  }
 
   type ErrorResponse = {
     /** 业务约定的错误码 */

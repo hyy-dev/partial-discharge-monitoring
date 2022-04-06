@@ -41,7 +41,7 @@ public class DataSimulator {
             if (span == null) continue;
             try {
                 Date lastTime = ft.parse(span.getLastCollectedTime());
-                // 时间差大于4小时需要插入数据
+                // 时间差大于12小时需要插入数据
                 while (new Date().getTime() - lastTime.getTime() > INTERVAL) {
                     // 时间递增
                     lastTime = new Date(lastTime.getTime() + INTERVAL);

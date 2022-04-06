@@ -11,7 +11,6 @@ public class UseStaticResourceConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        System.out.println("registry");
         registry.addResourceHandler("/**").addResourceLocations("classpath:/templates/");
     }
 }

@@ -28,14 +28,14 @@ const Record: React.FC<{}> = (props) => {
     run: updateMonitorDate,
     cancel,
   } = useRequest(
-    async (update?: boolean) => {
-      if (update) {
+    async () => {
+      if (willUpdate) {
         setRange([range[0], moment()]);
       }
       const params = {
         deviceId,
         startTime: (range[0] as Moment).format('YYYY-MM-DD HH:mm:ss'),
-        endTime: (update ? moment() : (range[1] as Moment)).format('YYYY-MM-DD HH:mm:ss'),
+        endTime: (willUpdate ? moment() : (range[1] as Moment)).format('YYYY-MM-DD HH:mm:ss'),
       };
       return getRecord(params);
     },
@@ -58,6 +58,7 @@ const Record: React.FC<{}> = (props) => {
     <PageContainer>
       <div className={styles.record}>
         <div className={styles.data} style={showList ? undefined : { width: '100%' }}>
+          <a href='www.baidu.com'>百度</a>
           <Card
             title={devices.find((val) => val.deviceId === deviceId)?.name ?? '设备名称'}
             extra={

@@ -47,6 +47,7 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
   const [dataSource, setDataSource] = useState<API.DeviceInfo[]>([]);
+  const [devices, setDevices] = useState<API.DeviceInfo[]>([]);
   const { initialState } = useModel('@@initialState');
 
   const handleEdit = async (values: API.DeviceInfo) => {
@@ -158,7 +159,7 @@ const TableList: React.FC = () => {
           }
         }),
       ).then(
-        (res) => {
+        () => {
           message.success('修改设备权重成功');
         },
         () => {
@@ -221,6 +222,7 @@ const TableList: React.FC = () => {
           const res = await getDevices();
           let managedRes: API.DeviceInfo[] = [];
           if (res.data) {
+            setDevices(res.data);
             managedRes = res.data.filter(
               (val) =>
                 (!params.deviceId || (val.deviceId + '').includes(params.deviceId)) &&
@@ -250,9 +252,9 @@ const TableList: React.FC = () => {
         hasInitialType={false}
         actionRef={actionRef}
         currentDeviceConfig={{
-          deviceId: Math.max(...dataSource.map((device) => device.deviceId)) + 1,
+          deviceId: Math.max(...devices.map((device) => device.deviceId)) + 1,
           name: '',
-          sortWeight: Math.max(...dataSource.map((device) => device.sortWeight)) + 1,
+          sortWeight: Math.max(...devices.map((device) => device.sortWeight)) + 1,
           type: 0,
         }}
         visible={createModalVisible}

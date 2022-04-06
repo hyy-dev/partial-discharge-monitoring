@@ -1,6 +1,6 @@
 import { Alert, Button, message, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { ProFormText, LoginForm, ProFormSelect } from '@ant-design/pro-form';
+import {ProFormText, LoginForm, ProFormSelect, ProFormCheckbox} from '@ant-design/pro-form';
 import { history, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { loginUsingPOST7 as login } from '@/services/api/userController';
@@ -26,10 +26,11 @@ const Login: React.FC = () => {
   const [type, setType] = useState<string>('login');
   const { setInitialState } = useModel('@@initialState');
 
-  const handleLogin = async (values: API.LoginParams) => {
+  const handleLogin = async (values: API.LoginFormParams) => {
     try {
       // 登录
-      const res = await login({ ...values});
+      const { userName, password, isAutoLogin } = values;
+      const res = await login({ userName, password});
       if (res.code === 0) {
         const defaultLoginSuccessMessage = "登录成功";
         message.success(defaultLoginSuccessMessage);
@@ -39,8 +40,10 @@ const Login: React.FC = () => {
           currentUser: {...res.user, token: res.token},
         }));
         // 保存登录状态
-        localStorage.setItem('monitor_userName', res.user?.userName ?? '');
-        localStorage.setItem('monitor_password', res?.user?.passWord ?? '');
+        if(isAutoLogin) {
+          localStorage.setItem('monitor_userName', res.user?.userName ?? '');
+          localStorage.setItem('monitor_password', res?.user?.passWord ?? '');
+        }
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
         const { query } = history.location;
@@ -153,6 +156,11 @@ const Login: React.FC = () => {
                   },
                 ]}
               />
+              <div style={{paddingLeft: '25%'}}>
+                <ProFormCheckbox
+                  name="isAutoLogin"
+                >自动登录</ProFormCheckbox>
+              </div>
             </>
           )}
 

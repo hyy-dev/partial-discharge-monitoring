@@ -46,7 +46,7 @@
 //     * @return json
 //     */
 //    @RequestMapping("/create")
-//    @ResponseBody
+//    @ResponseBodyq
 //    public String creatShortUrl(String longUrl, String viewPwd, HttpServletRequest request) {
 //        JSONObject json = new JSONObject();
 //        String[] split = longUrl.split("\n|\r");
