@@ -13,6 +13,9 @@ export async function getRecordUsingGET7(
     params: {
       ...params,
     },
+    headers: {
+      'Cache-Control': 'public;max-age:3600',
+    },
     ...(options || {}),
   });
 }

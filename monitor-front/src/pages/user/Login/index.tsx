@@ -110,7 +110,10 @@ const Login: React.FC = () => {
             },
           }}
         >
-          <Tabs activeKey={type} onChange={setType}>
+          <Tabs activeKey={type} onChange={(value) => {
+            setType(value);
+            setUserLoginState(undefined);
+          }}>
             <Tabs.TabPane
               key="login"
               tab="登录"

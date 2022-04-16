@@ -58,7 +58,6 @@ const Record: React.FC<{}> = (props) => {
     <PageContainer>
       <div className={styles.record}>
         <div className={styles.data} style={showList ? undefined : { width: '100%' }}>
-          <a href='www.baidu.com'>百度</a>
           <Card
             title={devices.find((val) => val.deviceId === deviceId)?.name ?? '设备名称'}
             extra={

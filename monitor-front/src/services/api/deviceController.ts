@@ -75,6 +75,7 @@ export async function editDevice(data: API.DeviceInfo, token: string) {
     headers: {
       Authorization: token,
     },
+    skipErrorHandler: true
   });
 }
 
